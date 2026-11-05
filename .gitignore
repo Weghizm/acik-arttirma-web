@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.gemini_key
+card_template/
+static/cards/*.png
+static/cards/*.jpg
+setup_vps.sh
+update_nginx.sh

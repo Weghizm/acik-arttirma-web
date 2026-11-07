@@ -1,0 +1,2720 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Açık Arttırma — Canlı Müzayede</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-app: #131720;
+      --bg-surface: #1B202C;
+      --bg-elevated: #232A3A;
+      --bg-input: #10141C;
+      --border: #2E3648;
+      --border-light: #3D475E;
+      --gold: #F0B429;
+      --gold-hover: #F7C948;
+      --gold-dark: #B47D0E;
+      --gold-soft: rgba(240, 180, 41, 0.14);
+      --emerald: #10B981;
+      --emerald-soft: rgba(16, 185, 129, 0.14);
+      --crimson: #EF4444;
+      --crimson-soft: rgba(239, 68, 68, 0.14);
+      --blue: #3B82F6;
+      --text-main: #F8FAFC;
+      --text-sub: #CBD5E1;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 7px;
+      --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.32);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-app);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    input, textarea, button {
+      font-family: inherit;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-input);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-light);
+      border-radius: 3px;
+    }
+
+    /* ======================================================================
+       TOP NAVIGATION BAR
+    ====================================================================== */
+    .navbar {
+      height: 58px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .nav-left, .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-logo {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      background: var(--gold);
+      display: inline-block;
+    }
+
+    .chip {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 11px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sub);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .chip.emerald {
+      background: var(--emerald-soft);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #34D399;
+    }
+
+    .chip.gold {
+      background: var(--gold-soft);
+      border-color: rgba(240, 180, 41, 0.35);
+      color: var(--gold);
+      cursor: pointer;
+    }
+
+    /* BUTTONS */
+    .btn {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      border-radius: var(--radius-sm);
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.14s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: #2C3548;
+      border-color: #4E5B78;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #11151E;
+      font-weight: 800;
+    }
+
+    .btn-gold:hover:not(:disabled) {
+      background: var(--gold-hover);
+      border-color: var(--gold-hover);
+    }
+
+    .btn-emerald {
+      background: var(--emerald);
+      border-color: var(--emerald);
+      color: #062218;
+      font-weight: 800;
+    }
+
+    .btn-emerald:hover:not(:disabled) {
+      background: #34D399;
+    }
+
+    .btn-crimson {
+      background: var(--crimson-soft);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #FCA5A5;
+    }
+
+    .btn-crimson:hover:not(:disabled) {
+      background: rgba(239, 68, 68, 0.25);
+    }
+
+    /* ======================================================================
+       VIEW 0: ENTRY GATE (Yeni Özel Masa Kur / Koda Göre Katıl)
+    ====================================================================== */
+    #entryGateView {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .gate-box {
+      width: 100%;
+      max-width: 430px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .gate-header {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .gate-header h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .gate-header p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .field-group {
+      margin-bottom: 16px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .field-input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 11px 13px;
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .field-input:focus {
+      border-color: var(--gold);
+    }
+
+    .gate-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0;
+      color: var(--text-dim);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .gate-divider::before, .gate-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .join-code-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* ======================================================================
+       VIEW 1: LOBBY / SETUP VIEW (2 Sütunlu Dengeli & Mobil Uyumlu)
+    ====================================================================== */
+    #setupView {
+      display: none;
+      flex: 1;
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 20px 16px 32px;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .invite-banner {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .invite-code-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .secret-code-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--gold);
+      background: var(--bg-input);
+      border: 1px solid rgba(240, 180, 41, 0.4);
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+    }
+
+    .setup-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .card-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-head h2 {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: 0.3px;
+    }
+
+    .players-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .player-badge {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .player-badge .host-tag {
+      font-size: 10px;
+      background: var(--gold-soft);
+      color: var(--gold);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .settings-row-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .ai-quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .quick-chip {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-sub);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .quick-chip:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .ai-log-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      max-height: 115px;
+      overflow-y: auto;
+      font-size: 12px;
+      line-height: 1.45;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    /* ======================================================================
+       VIEW 2: GAME SCREEN (Telefon ve Bilgisayar Uyumlu Masa)
+    ====================================================================== */
+    #gameView {
+      display: none;
+      flex: 1;
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 12px 14px 20px;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* 1. RAKİPLER ŞERİDİ (Mobilde Yana Kaydırılabilir, Masaüstünde Dengeli Satır) */
+    .opponents-ribbon {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+
+    .opp-pill-card {
+      flex: 1;
+      min-width: 245px;
+      max-width: 340px;
+      scroll-snap-align: start;
+      background: linear-gradient(180deg, rgba(35, 42, 58, 0.75) 0%, var(--bg-surface) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 11px 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .opp-pill-card.turn-holder {
+      border-color: rgba(240, 180, 41, 0.55);
+    }
+
+    .opp-pill-card.active-leader {
+      border-color: var(--emerald);
+      box-shadow: 0 0 0 1px var(--emerald), 0 6px 18px rgba(16, 185, 129, 0.15);
+    }
+
+    .opp-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .opp-identity {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .opp-avatar-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+
+    .opp-name-col {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      gap: 2px;
+    }
+
+    .opp-name-wrap {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .opp-meta-line {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .opp-money-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 800;
+      color: #34D399;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 4px 9px;
+      border-radius: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .opp-roster-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .opp-mini-slot {
+      height: 46px;
+      border-radius: 6px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      padding: 2px;
+    }
+
+    .opp-mini-slot.filled {
+      border-color: var(--border-light);
+      background: #141924;
+      justify-content: flex-end;
+      padding: 0;
+    }
+
+    .opp-mini-slot.filled img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 15%;
+      opacity: 0.88;
+    }
+
+    .opp-mini-slot-name {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      background: linear-gradient(to top, rgba(10, 13, 20, 0.95) 0%, rgba(10, 13, 20, 0.65) 75%, transparent 100%);
+      color: #F8FAFC;
+      font-size: 8.5px;
+      font-weight: 700;
+      text-align: center;
+      padding: 6px 2px 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .opp-mini-slot.empty-dot::after {
+      content: '';
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--border-light);
+      opacity: 0.6;
+    }
+
+    .opp-mini-slot.lost-slot {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: rgba(239, 68, 68, 0.25);
+      color: #F87171;
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .badge-status {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+    }
+    .st-turn   { background: rgba(240, 180, 41, 0.18); color: var(--gold); border: 1px solid rgba(240, 180, 41, 0.35); }
+    .st-shield { background: rgba(59, 130, 246, 0.2); color: #60A5FA; }
+    .st-freeze { background: rgba(6, 182, 212, 0.2); color: #22D3EE; }
+    .st-curse  { background: rgba(239, 68, 68, 0.2); color: #F87171; }
+
+    /* 2. MERKEZ SAHNE: SENARYO + CS ŞERİDİ + CANLI TEKLİF KÜRSÜSÜ */
+    .stage-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .scenario-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .scenario-bar strong {
+      color: var(--gold);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 6px;
+    }
+
+    /* CS HORIZONTAL REEL */
+    .reel-viewport {
+      position: relative;
+      width: 100%;
+      height: 186px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .reel-viewport::before,
+    .reel-viewport::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 90px;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .reel-viewport::before {
+      left: 0;
+      background: linear-gradient(to right, var(--bg-input) 0%, transparent 100%);
+    }
+
+    .reel-viewport::after {
+      right: 0;
+      background: linear-gradient(to left, var(--bg-input) 0%, transparent 100%);
+    }
+
+    .reel-pointer {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--gold);
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+
+    .reel-pointer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 10px solid var(--gold);
+    }
+
+    .reel-pointer::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 10px solid var(--gold);
+    }
+
+    .reel-track {
+      display: flex;
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      align-items: center;
+      padding: 0 10px;
+      will-change: transform;
+    }
+
+    .reel-card {
+      width: 144px;
+      height: 164px;
+      margin: 0 4px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-light);
+      border-bottom: 3px solid #3B82F6;
+      border-radius: var(--radius-sm);
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .reel-card.tier-mor { border-bottom-color: #8B5CF6; }
+    .reel-card.tier-pembe { border-bottom-color: #EC4899; }
+    .reel-card.tier-kirmizi { border-bottom-color: #EF4444; }
+    .reel-card.tier-altin { border-bottom-color: var(--gold); }
+
+    .reel-img-box {
+      width: 100%;
+      height: 112px;
+      border-radius: 5px;
+      overflow: hidden;
+      position: relative;
+      background: #0D1017;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .reel-img-blur {
+      position: absolute;
+      top: -15%;
+      left: -15%;
+      width: 130%;
+      height: 130%;
+      object-fit: cover;
+      filter: blur(12px) brightness(0.5);
+      opacity: 0.6;
+    }
+
+    .reel-img-main {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      z-index: 1;
+    }
+
+    .reel-img-box.contain-mode .reel-img-main {
+      object-fit: contain;
+      object-position: center center;
+    }
+
+    .reel-monogram {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--gold);
+      background: #141923;
+    }
+
+    .reel-item-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+      text-align: center;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.2;
+      overflow: hidden;
+    }
+
+    /* BIDDING PODIUM */
+    .bidding-podium {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .lot-showcase {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .lot-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+      overflow: hidden;
+      background: var(--bg-elevated);
+      flex-shrink: 0;
+    }
+
+    .lot-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 15%;
+    }
+
+    .lot-name {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .lot-status {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .bid-live-metrics {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .metric-block {
+      text-align: center;
+    }
+
+    .metric-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .metric-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--gold);
+    }
+
+    .bid-actions-wrap {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    #liveBidButtons {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .bid-input-num {
+      width: 68px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 8px;
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    /* 3. ALT OYUNCU KONSOLU (Kendi Kartın & Gizli Elin) */
+    .player-console {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .console-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .console-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .console-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slots-row {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .slot-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      height: 116px;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .slot-box.empty {
+      border-style: dashed;
+      justify-content: center;
+      color: var(--text-dim);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .slot-box.debuff-locked {
+      background: var(--crimson-soft);
+      border-color: rgba(239, 68, 68, 0.35);
+      justify-content: center;
+      color: #FCA5A5;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .slot-box.interactive {
+      cursor: pointer;
+      transition: transform 0.14s, border-color 0.14s;
+    }
+
+    .slot-box.interactive:hover {
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    .slot-thumb {
+      width: 100%;
+      height: 70px;
+      border-radius: 4px;
+      overflow: hidden;
+      background: #0B0E14;
+    }
+
+    .slot-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 15%;
+    }
+
+    .card-slot-thumb {
+      background: #090C12 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 3px !important;
+    }
+
+    .card-slot-thumb img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.85));
+    }
+
+    .slot-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-main);
+      text-align: center;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .slot-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    /* ======================================================================
+       MODALS
+    ====================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 12, 18, 0.82);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-dialog {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 1040px;
+      max-height: 88dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-header {
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .modal-body {
+      padding: 16px 18px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .shop-tabs-bar {
+      display: flex;
+      gap: 6px;
+      padding: 10px 18px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .shop-tabs-bar::-webkit-scrollbar { display: none; }
+
+    .shop-tab {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-sub);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .shop-tab:hover {
+      border-color: var(--border-light);
+      color: var(--text-main);
+    }
+    .shop-tab.active {
+      background: var(--gold-soft);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .shop-tab.tab-odul.active {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: #10B981;
+      color: #34D399;
+    }
+    .shop-tab.tab-ceza.active {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: #EF4444;
+      color: #F87171;
+    }
+    .shop-tab.tab-savunma.active {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: #3B82F6;
+      color: #60A5FA;
+    }
+    .shop-tab.tab-lanet.active {
+      background: rgba(168, 85, 247, 0.15);
+      border-color: #A855F7;
+      color: #C084FC;
+    }
+    .tab-badge {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background: var(--bg-input);
+      color: var(--text-dim);
+    }
+    .shop-tab.active .tab-badge {
+      background: rgba(255,255,255,0.15);
+      color: inherit;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 12px;
+    }
+
+    .shop-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
+      position: relative;
+      transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+    }
+    .shop-card:hover {
+      border-color: var(--border-light);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+    }
+    .shop-card.cat-odul { border-left: 3px solid #10B981; }
+    .shop-card.cat-ceza { border-left: 3px solid #EF4444; }
+    .shop-card.cat-savunma { border-left: 3px solid #3B82F6; }
+    .shop-card.cat-lanet { border-left: 3px solid #A855F7; }
+
+    .shop-card-img-wrap {
+      position: relative;
+      width: 82px;
+      min-width: 82px;
+      height: 122px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+      background: #0B0E14;
+      flex-shrink: 0;
+    }
+    .shop-card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 0.2s ease;
+    }
+    .shop-card-img-wrap:hover img {
+      transform: scale(1.06);
+    }
+    .shop-card-zoom-badge {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10, 13, 20, 0.88);
+      color: var(--gold);
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid rgba(240, 180, 41, 0.35);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .shop-card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .shop-card-cat-badge {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      width: fit-content;
+    }
+    .cat-badge-odul { background: rgba(16, 185, 129, 0.15); color: #34D399; }
+    .cat-badge-ceza { background: rgba(239, 68, 68, 0.15); color: #F87171; }
+    .cat-badge-savunma { background: rgba(59, 130, 246, 0.15); color: #60A5FA; }
+    .cat-badge-lanet { background: rgba(168, 85, 247, 0.15); color: #C084FC; }
+
+    .shop-card-price {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 800;
+      color: #34D399;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 2px 7px;
+      border-radius: 5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .shop-card-name {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+    .shop-card-name:hover {
+      color: var(--gold);
+    }
+
+    .shop-card-desc {
+      font-size: 11px;
+      color: var(--text-sub);
+      line-height: 1.35;
+    }
+
+    .shop-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9.5px;
+      color: var(--text-dim);
+      font-weight: 700;
+    }
+
+    /* TOASTS */
+    #toastContainer {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 360px;
+      width: calc(100% - 40px);
+      pointer-events: none;
+    }
+
+    .toast-item {
+      background: var(--bg-elevated);
+      border: 1px solid var(--gold);
+      border-left: 4px solid var(--gold);
+      color: var(--text-main);
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: var(--shadow-card);
+    }
+
+    /* MOBILE RESPONSIVE BREAKPOINTS */
+    @media (max-width: 860px) {
+      .setup-grid {
+        grid-template-columns: 1fr;
+      }
+      .player-console {
+        grid-template-columns: 1fr;
+      }
+      .bidding-podium {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 11px 12px;
+        gap: 10px;
+      }
+      .bid-live-metrics {
+        justify-content: space-around;
+        background: var(--bg-surface);
+        padding: 8px 6px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        gap: 10px;
+      }
+      .bid-actions-wrap {
+        width: 100%;
+        justify-content: stretch;
+      }
+      #btnSpinReel {
+        width: 100%;
+      }
+      #liveBidButtons {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+      }
+      #liveBidButtons .bid-input-num {
+        grid-column: span 2;
+        width: 100%;
+      }
+      #liveBidButtons .btn-emerald {
+        grid-column: span 2;
+      }
+      .navbar {
+        padding: 0 10px;
+        height: 52px;
+      }
+      .brand-logo span.hide-mobile {
+        display: none;
+      }
+      .chip {
+        padding: 4px 8px;
+        font-size: 11px;
+      }
+      .nav-right .btn {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      #gameView {
+        padding: 8px 8px 16px;
+        gap: 8px;
+      }
+      #setupView {
+        padding: 12px 10px 24px;
+        gap: 12px;
+      }
+      .card-panel {
+        padding: 14px 12px;
+      }
+      .invite-banner {
+        padding: 12px;
+      }
+      .opp-pill-card {
+        min-width: 220px;
+        max-width: 265px;
+        padding: 9px 10px;
+        gap: 7px;
+      }
+      .opp-mini-slot {
+        height: 40px;
+      }
+      .stage-box {
+        padding: 10px;
+        gap: 9px;
+      }
+      .scenario-bar {
+        padding: 7px 10px;
+        font-size: 12px;
+      }
+      .reel-viewport {
+        height: 148px;
+      }
+      .reel-viewport::before,
+      .reel-viewport::after {
+        width: 44px;
+      }
+      .reel-card {
+        width: 112px;
+        height: 132px;
+        padding: 5px;
+      }
+      .reel-img-box {
+        height: 86px;
+      }
+      .reel-item-name {
+        font-size: 11px;
+        height: 26px;
+      }
+      .lot-name {
+        font-size: 15px;
+      }
+      .lot-status {
+        font-size: 11px;
+      }
+      .metric-val {
+        font-size: 16px;
+      }
+      .console-panel {
+        padding: 10px 10px;
+        gap: 8px;
+      }
+      .slots-row {
+        gap: 5px;
+      }
+      .slot-box {
+        height: 98px;
+        padding: 4px;
+      }
+      .slot-thumb {
+        height: 54px;
+      }
+      .slot-label {
+        font-size: 10px;
+      }
+      .slot-sub {
+        font-size: 9px;
+      }
+      .modal-backdrop {
+        padding: 8px;
+      }
+      .modal-dialog {
+        max-height: 92dvh;
+      }
+      .modal-header {
+        padding: 12px 14px;
+      }
+      .modal-body {
+        padding: 12px;
+      }
+      .shop-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVBAR -->
+  <header class="navbar">
+    <div class="nav-left">
+      <div class="brand-logo">
+        <span class="brand-dot"></span>
+        <span class="hide-mobile">AÇIK ARTTIRMA</span>
+      </div>
+      <span class="chip emerald" id="topRemainingPill">25 isim</span>
+      <span class="chip gold" id="topRoomPill" style="display:none" onclick="copyInviteLink()" title="Davet linkini kopyala">Oda: -</span>
+    </div>
+
+    <div class="nav-right">
+      <button class="btn" id="btnOpenShopTop" style="display:none" onclick="openShopModal()">Mağaza</button>
+      <button class="btn" id="btnUndoTop" style="display:none" onclick="sendUndo()">↺ Geri Al</button>
+      <button class="btn" id="btnLobbyTop" style="display:none" onclick="sendReturnLobby()">Lobi</button>
+    </div>
+  </header>
+
+  <div id="toastContainer"></div>
+
+  <!-- ====================================================================
+       VIEW 0: ENTRY GATE (Rastgele Gizli Masa Kur veya Koda Göre Katıl)
+  ==================================================================== -->
+  <main id="entryGateView">
+    <div class="gate-box">
+      <div class="gate-header">
+        <h1>Açık Arttırma</h1>
+        <p>Arkadaşlarınla özel oda kur veya davet koduyla masaya katıl</p>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Oyuncu Adın</label>
+        <input type="text" id="gatePlayerName" class="field-input" placeholder="Adını yaz (Örn: Mehmet)" maxlength="20" onkeydown="if(event.key==='Enter'){ document.getElementById('gateRoomCode').value.trim() ? joinExistingRoom() : createNewSecretRoom(); }" />
+      </div>
+
+      <div class="join-code-row" style="margin-bottom:4px">
+        <input type="text" id="gateRoomCode" class="field-input" placeholder="6 Haneli Masa Kodu" maxlength="10" style="text-transform:uppercase;font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:1.5px" onkeydown="if(event.key==='Enter') joinExistingRoom()" />
+        <button type="button" class="btn btn-emerald" style="padding:0 22px" onclick="joinExistingRoom()">
+          MASAYA KATIL
+        </button>
+      </div>
+
+      <div class="gate-divider">veya sıfırdan masa aç</div>
+
+      <button type="button" class="btn btn-gold" style="width:100%;padding:13px;font-size:14px" onclick="createNewSecretRoom()">
+        + YENİ ÖZEL MASA KUR
+      </button>
+    </div>
+  </main>
+
+  <!-- ====================================================================
+       VIEW 1: LOBBY / SETUP VIEW
+  ==================================================================== -->
+  <section id="setupView">
+    <!-- DAVET & MASA KODU BARI -->
+    <div class="invite-banner">
+      <div class="invite-code-box">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Özel Masa Kodu</div>
+          <div style="font-size:12px;color:var(--text-sub);margin-top:2px">Bu kodu veya davet linkini sadece arkadaşlarınla paylaş</div>
+        </div>
+        <span class="secret-code-pill" id="lobbySecretCode">------</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" onclick="copyInviteLink()">🔗 Davet Linkini Kopyala</button>
+        <button class="btn btn-gold" id="btnStartGameTop" onclick="sendStartGame()">MÜZAYEDEYİ BAŞLAT →</button>
+      </div>
+    </div>
+
+    <div class="setup-grid">
+      <!-- SOL SÜTUN: OYUNCULAR & KURALLAR -->
+      <div class="card-panel">
+        <div class="section-head">
+          <h2>Masadaki Oyuncular (<span id="lobbyPlayerCount">1</span>/8)</h2>
+          <span id="hostRoleTag" style="font-size:11px;color:var(--gold);font-weight:700">Masa Kurucusu</span>
+        </div>
+
+        <div class="players-list" id="lobbyPlayersGrid"></div>
+
+        <div class="section-head" style="margin-top:6px">
+          <h2>Oyun Kuralları</h2>
+        </div>
+
+        <div>
+          <label class="field-label">Müzayede Senaryosu</label>
+          <textarea id="setupScenario" class="field-input" rows="3" oninput="scheduleSetupSync()">Bu karakterler savaşa girse hangi takım kazanır?</textarea>
+        </div>
+
+        <div class="settings-row-3">
+          <div>
+            <label class="field-label">Bütçe (₺)</label>
+            <input type="number" id="setupBudget" class="field-input" value="30" min="5" max="500" oninput="scheduleSetupSync()" />
+          </div>
+          <div>
+            <label class="field-label">Kadro Boyutu</label>
+            <input type="number" id="setupCapacity" class="field-input" value="5" min="1" max="5" oninput="scheduleSetupSync()" />
+          </div>
+          <div>
+            <label class="field-label">Teklif Süresi (sn)</label>
+            <input type="number" id="setupTimer" class="field-input" value="14" min="6" max="60" oninput="scheduleSetupSync()" />
+          </div>
+        </div>
+
+        <div>
+          <label class="field-label">Gemini API Anahtarı (İsteğe Bağlı / Otomatik Algılı)</label>
+          <input type="password" id="setupApiKey" class="field-input" placeholder="Kendi Gemini API anahtarınızı girebilirsiniz..." oninput="scheduleSetupSync()" />
+        </div>
+      </div>
+
+      <!-- SAĞ SÜTUN: AI İSİM ASİSTANI & HAVUZ -->
+      <div class="card-panel">
+        <div class="section-head">
+          <h2>AI İsim Asistanı</h2>
+          <span style="font-size:11px;color:var(--text-muted)">Senaryoya göre otomatik karakter üretir</span>
+        </div>
+
+        <div class="ai-quick-chips">
+          <span class="quick-chip" onclick="quickAiPrompt('Senaryoya uygun 50 isim öner')">⚡ Senaryoya Göre 50 İsim</span>
+          <span class="quick-chip" onclick="quickAiPrompt('Hepsini sil ve 30 popüler film/dizi karakteri ekle')">🎬 30 Film Karakteri</span>
+          <span class="quick-chip" onclick="quickAiPrompt('Hepsini sil ve 30 ünlü bilim insanı ve lider ekle')">🧠 30 Tarihi Kişilik</span>
+          <span class="quick-chip" onclick="quickAiPrompt('Hepsini sil ve 30 Türk mutfağı yemeği ekle')">🍽️ 30 Yemek Menüsü</span>
+        </div>
+
+        <div class="ai-log-box" id="aiChatHistoryBox"></div>
+
+        <div style="display:flex;gap:8px">
+          <input type="text" id="aiChatInput" class="field-input" placeholder="Örn: '50 isim öner' veya 'Kurtlar Vadisi karakterleri ekle'..." onkeydown="if(event.key==='Enter') sendAiPoolPrompt()" />
+          <button class="btn btn-gold" id="btnAiSend" onclick="sendAiPoolPrompt()">ÜRET</button>
+        </div>
+
+        <div class="section-head" style="margin-top:4px">
+          <h2>İsim Havuzu</h2>
+          <span id="setupPoolCount" style="font-size:12px;font-weight:700;color:var(--emerald)">25 İsim Hazır</span>
+        </div>
+
+        <textarea id="setupPoolTextarea" class="field-input" style="min-height:190px;font-size:13px" placeholder="Her satıra bir isim..." oninput="scheduleSetupSync()"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       VIEW 2: GAME SCREEN (Herkes Kendi Ekranında)
+  ==================================================================== -->
+  <section id="gameView">
+    <!-- 1. MASADAKİ DİĞER OYUNCULAR ŞERİDİ -->
+    <div class="opponents-ribbon" id="opponentsBar"></div>
+
+    <!-- 2. MERKEZ MÜZAYEDE SAHNESİ -->
+    <div class="stage-box">
+      <div class="scenario-bar">
+        <div>
+          <strong>SENARYO:</strong>
+          <span id="liveScenarioText">-</span>
+        </div>
+        <span style="font-size:12px;font-weight:700;color:var(--text-muted);white-space:nowrap">
+          Tur <span id="liveRoundNum" style="color:var(--text-main)">1</span>
+        </span>
+      </div>
+
+      <!-- CS KAYAR ŞERİT -->
+      <div class="reel-viewport" id="reelViewport">
+        <div class="reel-pointer"></div>
+        <div class="reel-track" id="reelTrack"></div>
+      </div>
+
+      <!-- CANLI İHALE KÜRSÜSÜ -->
+      <div class="bidding-podium">
+        <div class="lot-showcase">
+          <div class="lot-avatar" id="bidLotThumb" style="display:none"></div>
+          <div>
+            <div class="lot-name" id="bidLotTitle">Yeni İhale İçin Hazır</div>
+            <div class="lot-status" id="bidLotSub">Sıradaki karakteri seçmek için şeridi döndürün</div>
+          </div>
+        </div>
+
+        <div class="bid-live-metrics" id="bidMetricsBox" style="display:none">
+          <div class="metric-block">
+            <div class="metric-lbl">En Yüksek Teklif</div>
+            <div class="metric-val" id="bidHighestVal">0 ₺</div>
+          </div>
+          <div class="metric-block">
+            <div class="metric-lbl">Lider Oyuncu</div>
+            <div class="metric-val" id="bidLeaderName" style="font-size:15px;color:var(--text-main)">-</div>
+          </div>
+          <div class="metric-block">
+            <div class="metric-lbl">Süre</div>
+            <div class="metric-val" id="bidTimerVal" style="color:var(--emerald)">14.0s</div>
+          </div>
+        </div>
+
+        <div class="bid-actions-wrap">
+          <button class="btn btn-gold" id="btnSpinReel" style="padding:11px 22px;font-size:14px" onclick="sendSpin()">
+            ⟳ ŞERİDİ DÖNDÜR
+          </button>
+
+          <div id="liveBidButtons" style="display:none">
+            <button class="btn btn-gold" onclick="placeQuickBid(1)">+1 ₺</button>
+            <button class="btn btn-gold" onclick="placeQuickBid(2)">+2 ₺</button>
+            <button class="btn btn-gold" onclick="placeQuickBid(5)">+5 ₺</button>
+            <button class="btn btn-crimson" onclick="sendPassBid()">Pas</button>
+            <input type="number" id="customBidAmount" class="bid-input-num" placeholder="Özel ₺" min="1" />
+            <button class="btn btn-emerald" onclick="placeCustomBid()">Teklif Ver</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. ALT OYUNCU KONSOLU (Sadece Senin Kadron, Bütçen ve Gizli Kartların) -->
+    <div class="player-console">
+      <!-- SOL PANEL: KENDİ KADROM VE BÜTÇEM -->
+      <div class="console-panel">
+        <div class="console-top">
+          <div class="console-title">
+            <span id="myConsoleName">KADROM</span>
+            <span id="myStatusBadges" style="display:inline-flex;gap:4px"></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="chip emerald" id="myBudgetVal">30 ₺</span>
+            <span class="chip" id="myRosterCounter">0 / 5</span>
+          </div>
+        </div>
+        <div class="slots-row" id="myRosterGrid"></div>
+      </div>
+
+      <!-- SAĞ PANEL: GİZLİ AKSİYON KARTLARIM VE MAĞAZA -->
+      <div class="console-panel">
+        <div class="console-top">
+          <div class="console-title">
+            <span>GİZLİ KARTLARIM</span>
+            <span style="font-size:11px;font-weight:600;color:var(--text-muted)">(Sadece sen görürsün)</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="chip gold" id="myPointsVal">0 P</span>
+            <button class="btn btn-gold" style="padding:5px 11px;font-size:12px" onclick="openShopModal()">+ Kart Mağazası</button>
+          </div>
+        </div>
+        <div class="slots-row" id="mySecretHandGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       MODAL 1: KART MAĞAZASI
+  ==================================================================== -->
+  <div class="modal-backdrop" id="shopModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <h3>Gizli Kart Mağazası</h3>
+          <span class="hide-mobile" style="font-size:12px;color:var(--text-muted);font-weight:600">Jüri puanlarınla taktiksel gizli kartlar satın al</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="chip gold" id="shopModalPoints" style="font-family:'JetBrains Mono';font-weight:800">0 P</span>
+          <button class="btn btn-crimson" onclick="closeShopModal()">Kapat</button>
+        </div>
+      </div>
+
+      <!-- KATEGORİ TABLARI -->
+      <div class="shop-tabs-bar">
+        <button class="shop-tab active" data-cat="all" onclick="filterShopCategory('all')">
+          Tümü <span class="tab-badge" id="tabCountAll">14</span>
+        </button>
+        <button class="shop-tab tab-odul" data-cat="odul" onclick="filterShopCategory('odul')">
+          💰 Ödül & Gelir <span class="tab-badge" id="tabCountOdul">5</span>
+        </button>
+        <button class="shop-tab tab-ceza" data-cat="ceza" onclick="filterShopCategory('ceza')">
+          ⚔️ Ceza & Saldırı <span class="tab-badge" id="tabCountCeza">4</span>
+        </button>
+        <button class="shop-tab tab-savunma" data-cat="savunma" onclick="filterShopCategory('savunma')">
+          🛡️ Savunma & Taktik <span class="tab-badge" id="tabCountSavunma">3</span>
+        </button>
+        <button class="shop-tab tab-lanet" data-cat="lanet" onclick="filterShopCategory('lanet')">
+          💀 Ağır Lanet <span class="tab-badge" id="tabCountLanet">2</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="shop-grid" id="shopGridContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 2: HEDEF RAKİP SEÇİMİ
+  ==================================================================== -->
+  <div class="modal-backdrop" id="targetModal">
+    <div class="modal-dialog" style="max-width:420px">
+      <div class="modal-header">
+        <h3 id="targetModalTitle">Hedef Rakip Seç</h3>
+        <button class="btn btn-crimson" onclick="closeTargetModal()">İptal</button>
+      </div>
+      <div class="modal-body" id="targetListContainer" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 3: AI JÜRİ MAÇ SONUCU
+  ==================================================================== -->
+  <div class="modal-backdrop" id="judgeModal">
+    <div class="modal-dialog" style="max-width:820px">
+      <div class="modal-header">
+        <h3>Jüri Kararı & Sıralama</h3>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-emerald" onclick="closeJudgeModal();openShopModal()">Kart Mağazası</button>
+          <button class="btn btn-gold" onclick="closeJudgeModal();sendReturnLobby()">Lobiye Dön</button>
+        </div>
+      </div>
+      <div class="modal-body" id="judgeModalBody"></div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 4: BÜYÜK KART İNCELEME & DETAY (CARD INSPECTOR)
+  ==================================================================== -->
+  <div class="modal-backdrop" id="cardDetailModal" onclick="if(event.target===this) closeCardDetailModal()">
+    <div class="modal-dialog" style="max-width: 430px; text-align: center;">
+      <div class="modal-header">
+        <h3 id="cardDetailTitle">Kart Detayı</h3>
+        <button class="btn btn-crimson" onclick="closeCardDetailModal()">Kapat</button>
+      </div>
+      <div class="modal-body" style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px 16px;">
+        <div id="cardDetailImgBox" style="position:relative;width:210px;height:314px;border-radius:10px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,0.8);border:2px solid var(--gold);background:#0B0E14;">
+          <img id="cardDetailImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;" />
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap">
+          <span class="shop-card-cat-badge" id="cardDetailCatBadge"></span>
+          <span class="chip" id="cardDetailTargetBadge" style="font-size:10px;padding:3px 8px;"></span>
+          <span class="chip" id="cardDetailCooldownBadge" style="font-size:10px;padding:3px 8px;"></span>
+        </div>
+        <div style="font-size:13px;color:var(--text-sub);line-height:1.5;max-width:330px;" id="cardDetailDesc"></div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:#34D399" id="cardDetailCost"></div>
+        <button class="btn btn-gold" id="cardDetailBuyBtn" style="width:100%;padding:12px;font-size:14px;font-weight:800" onclick="buyCardFromDetail()">SATIN AL</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let ws = null;
+    // sessionStorage her tarayıcı sekmesine ayrı kimlik verir (aynı tarayıcıda 2 sekme açıp karşılıklı test edebilmek için)
+    let myPlayerId = sessionStorage.getItem("aa_player_id") || ("p_" + Math.random().toString(36).substring(2, 10));
+    sessionStorage.setItem("aa_player_id", myPlayerId);
+
+    let roomState = null;
+    let isReelAnimating = false;
+    let audioCtx = null;
+    let pendingCardSlot = null;
+    let localTimerInterval = null;
+    let setupSyncTimer = null;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("oda")) {
+      document.getElementById("gateRoomCode").value = urlParams.get("oda").toUpperCase();
+    }
+    if (sessionStorage.getItem("aa_player_name")) {
+      document.getElementById("gatePlayerName").value = sessionStorage.getItem("aa_player_name");
+    }
+
+    function playMechanicalTick() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(115, audioCtx.currentTime + 0.032);
+        gain.gain.setValueAtTime(0.26, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.032);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.035);
+      } catch (e) {}
+    }
+
+    function showToast(msg) {
+      const c = document.getElementById("toastContainer");
+      const el = document.createElement("div");
+      el.className = "toast-item";
+      el.textContent = msg;
+      c.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+
+    function copyInviteLink() {
+      if (!roomState) return;
+      const url = `${window.location.origin}/?oda=${encodeURIComponent(roomState.roomCode)}`;
+      navigator.clipboard.writeText(url);
+      showToast(`Davet linki kopyalandı! Masa Kodu: ${roomState.roomCode}`);
+    }
+
+    async function createNewSecretRoom() {
+      const name = document.getElementById("gatePlayerName").value.trim() || "Oyuncu";
+      sessionStorage.setItem("aa_player_name", name);
+      try {
+        const res = await fetch("/api/create-room", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ playerId: myPlayerId }),
+        });
+        const data = await res.json();
+        if (!data.ok) {
+          showToast(data.error || "Masa kurulamadı.");
+          return;
+        }
+        connectToRoom(data.roomCode, name);
+      } catch (e) {
+        showToast("Masa oluşturulurken hata oluştu.");
+      }
+    }
+
+    async function joinExistingRoom() {
+      const name = document.getElementById("gatePlayerName").value.trim() || "Oyuncu";
+      const code = document.getElementById("gateRoomCode").value.trim().toUpperCase();
+      if (!code) {
+        showToast("Lütfen katılmak istediğiniz 6 haneli masa kodunu yazın.");
+        return;
+      }
+      sessionStorage.setItem("aa_player_name", name);
+      try {
+        const res = await fetch(`/api/check-room?code=${encodeURIComponent(code)}`);
+        const data = await res.json();
+        if (!data.exists) {
+          showToast(data.error || "Bu koda ait aktif bir masa bulunamadı!");
+          return;
+        }
+        connectToRoom(data.roomCode, name);
+      } catch (e) {
+        showToast("Masa kontrol edilirken hata oluştu.");
+      }
+    }
+
+    function connectToRoom(code, name) {
+      const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const wsUrl = `${proto}//${window.location.host}/ws/${encodeURIComponent(code)}/${encodeURIComponent(myPlayerId)}`;
+
+      if (ws) ws.close();
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        window.history.replaceState({}, "", `/?oda=${encodeURIComponent(code)}`);
+        ws.send(JSON.stringify({ action: "join", name }));
+      };
+
+      ws.onmessage = (ev) => {
+        const msg = JSON.parse(ev.data);
+        if (msg.type === "room_not_found") {
+          showToast(msg.message);
+          return;
+        } else if (msg.type === "kicked" || (msg.type === "state" && !msg.me)) {
+          if (ws) {
+            ws.onclose = null;
+            ws.close();
+            ws = null;
+          }
+          roomState = null;
+          window.history.replaceState({}, "", "/");
+          document.getElementById("setupView").style.display = "none";
+          document.getElementById("gameView").style.display = "none";
+          document.getElementById("entryGateView").style.display = "flex";
+          document.getElementById("topRoomPill").style.display = "none";
+          document.getElementById("btnOpenShopTop").style.display = "none";
+          document.getElementById("btnUndoTop").style.display = "none";
+          document.getElementById("btnLobbyTop").style.display = "none";
+          showToast(msg.message || "Masa kurucusu tarafından odadan çıkarıldınız.");
+          return;
+        } else if (msg.type === "state") {
+          roomState = msg;
+          renderApp();
+        } else if (msg.type === "spin_start") {
+          runSynchronizedReelSpin(msg);
+        } else if (msg.type === "card_played") {
+          showToast(msg.message);
+        } else if (msg.type === "sold") {
+          showToast(`SATILDI: ${msg.entry.name} → ${msg.buyerName} (${msg.price} ₺)`);
+        } else if (msg.type === "passed") {
+          showToast(`PAS GEÇİLDİ: ${msg.entry.name}`);
+        } else if (msg.type === "toast") {
+          showToast(msg.message);
+        }
+      };
+
+      ws.onclose = () => {
+        showToast("Bağlantı koptu, lütfen sayfayı yenileyin.");
+      };
+    }
+
+    // =========================================================================
+    // RENDER VIEWS
+    // =========================================================================
+    function renderApp() {
+      if (!roomState) return;
+
+      document.getElementById("entryGateView").style.display = "none";
+      const topRoomPill = document.getElementById("topRoomPill");
+      topRoomPill.style.display = "inline-flex";
+      topRoomPill.textContent = `Oda: ${roomState.roomCode}`;
+      document.getElementById("topRemainingPill").textContent = `${roomState.availableCount} isim`;
+
+      const isHost = roomState.hostId === myPlayerId;
+      document.getElementById("btnOpenShopTop").style.display = roomState.phase !== "setup" ? "inline-flex" : "none";
+      document.getElementById("btnUndoTop").style.display = (isHost && roomState.phase !== "setup") ? "inline-flex" : "none";
+      document.getElementById("btnLobbyTop").style.display = (isHost && roomState.phase !== "setup") ? "inline-flex" : "none";
+
+      if (roomState.phase === "setup") {
+        document.getElementById("setupView").style.display = "flex";
+        document.getElementById("gameView").style.display = "none";
+        renderSetupView(isHost);
+      } else {
+        document.getElementById("setupView").style.display = "none";
+        document.getElementById("gameView").style.display = "flex";
+        renderGameView(isHost);
+      }
+
+      if (roomState.phase === "finished" && (roomState.judgeEvaluating || roomState.judgeResult)) {
+        renderJudgeModal();
+      }
+    }
+
+    function renderSetupView(isHost) {
+      document.getElementById("lobbySecretCode").textContent = roomState.roomCode;
+      document.getElementById("hostRoleTag").textContent = isHost ? "Masa Kurucususun" : "Misafir Oyuncu";
+
+      const scEl = document.getElementById("setupScenario");
+      const bgEl = document.getElementById("setupBudget");
+      const cpEl = document.getElementById("setupCapacity");
+      const tmEl = document.getElementById("setupTimer");
+      const poolEl = document.getElementById("setupPoolTextarea");
+
+      if (document.activeElement !== scEl) scEl.value = roomState.scenario;
+      if (document.activeElement !== bgEl) bgEl.value = roomState.startingBudget;
+      if (document.activeElement !== cpEl) cpEl.value = roomState.rosterCapacity;
+      if (document.activeElement !== tmEl) tmEl.value = roomState.bidTimerSeconds;
+      if (document.activeElement !== poolEl) poolEl.value = roomState.poolNames.join("\n");
+
+      scEl.disabled = !isHost;
+      bgEl.disabled = !isHost;
+      cpEl.disabled = !isHost;
+      tmEl.disabled = !isHost;
+      poolEl.disabled = !isHost;
+      document.getElementById("btnStartGameTop").disabled = !isHost;
+      document.getElementById("setupPoolCount").textContent = `${roomState.poolCount} İsim Hazır`;
+
+      document.getElementById("lobbyPlayerCount").textContent = roomState.players.length;
+      const pGrid = document.getElementById("lobbyPlayersGrid");
+      pGrid.innerHTML = "";
+      roomState.players.forEach((p, idx) => {
+        const badge = document.createElement("div");
+        badge.className = "player-badge";
+        const removeBtn = (isHost && p.id !== roomState.hostId)
+          ? `<button class="btn btn-crimson" style="padding:2px 6px;font-size:10px" onclick="sendRemovePlayer('${p.id}')">✕</button>`
+          : "";
+        badge.innerHTML = `
+          <span>${idx + 1}. ${escapeHtml(p.name)}</span>
+          ${p.id === roomState.hostId ? '<span class="host-tag">KURUCU</span>' : ''}
+          ${removeBtn}
+        `;
+        pGrid.appendChild(badge);
+      });
+
+      const chatBox = document.getElementById("aiChatHistoryBox");
+      chatBox.innerHTML = roomState.chatHistory.map(m =>
+        `<div><strong style="color:var(--gold)">${escapeHtml(m.sender)}:</strong> ${escapeHtml(m.text)}</div>`
+      ).join("");
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function renderGameView(isHost) {
+      document.getElementById("liveScenarioText").textContent = roomState.scenario;
+      document.getElementById("liveRoundNum").textContent = roomState.currentRound;
+
+      // 1. Opponents Ribbon (Sadece İsim, Kadro ve Kalan Para — Gizli kart bilgisi kesinlikle gösterilmez)
+      const oppBar = document.getElementById("opponentsBar");
+      oppBar.innerHTML = "";
+      const opponents = roomState.players.filter(p => p.id !== myPlayerId);
+      if (opponents.length === 0) {
+        oppBar.style.display = "none";
+      } else {
+        oppBar.style.display = "flex";
+        opponents.forEach(p => {
+          const card = document.createElement("div");
+          const isLeader = roomState.highestBidderId === p.id && roomState.auctionState === "bidding";
+          const isTurn = roomState.turnPlayerId === p.id;
+          card.className = "opp-pill-card"
+            + (isLeader ? " active-leader" : "")
+            + (isTurn ? " turn-holder" : "");
+
+          const badges = [];
+          if (isTurn) badges.push('<span class="badge-status st-turn">SIRA ONDA</span>');
+          if (p.hasShield) badges.push('<span class="badge-status st-shield">KALKAN</span>');
+          if (p.isFrozen) badges.push('<span class="badge-status st-freeze">DONDU</span>');
+          if (p.hasBlackCurse) badges.push('<span class="badge-status st-curse">LANET</span>');
+          if (p.silencedRounds > 0) badges.push(`<span class="badge-status" style="background:rgba(168,85,247,0.25);color:#C084FC;border:1px solid rgba(168,85,247,0.4)">MÜHÜRLÜ (${p.silencedRounds})</span>`);
+
+          const totalOppSlots = p.baseCapacity || roomState.rosterCapacity || 5;
+          let miniSlotsHtml = "";
+          for (let i = 0; i < totalOppSlots; i++) {
+            if (i >= p.capacity) {
+              miniSlotsHtml += `<div class="opp-mini-slot lost-slot" title="Kayıp Slot">✕</div>`;
+            } else if (i < p.purchases.length) {
+              const pur = p.purchases[i];
+              const purImg = pur.image || (roomState.imageCache && roomState.imageCache[pur.name]);
+              const thumbHtml = purImg
+                ? `<img src="${purImg}" alt="" referrerpolicy="no-referrer" />`
+                : `<div class="reel-monogram" style="font-size:11px">${getInitials(pur.name)}</div>`;
+              miniSlotsHtml += `
+                <div class="opp-mini-slot filled" title="${escapeHtml(pur.name)} (${pur.price} ₺)">
+                  ${thumbHtml}
+                  <div class="opp-mini-slot-name">${escapeHtml(pur.name)}</div>
+                </div>
+              `;
+            } else {
+              miniSlotsHtml += `<div class="opp-mini-slot empty-dot" title="Boş Kadro Slotu"></div>`;
+            }
+          }
+
+          card.innerHTML = `
+            <div class="opp-head">
+              <div class="opp-identity">
+                <div class="opp-avatar-dot">${getInitials(p.name)}</div>
+                <div class="opp-name-col">
+                  <div class="opp-name-wrap">
+                    <span>${escapeHtml(p.name)}</span>
+                    ${badges.join("")}
+                  </div>
+                  <div class="opp-meta-line">
+                    <span>Kadro: ${p.purchases.length}/${p.capacity}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="opp-money-pill">${p.budget} ₺</div>
+            </div>
+            <div class="opp-roster-grid" style="grid-template-columns: repeat(${totalOppSlots}, minmax(0, 1fr))">
+              ${miniSlotsHtml}
+            </div>
+          `;
+          oppBar.appendChild(card);
+        });
+      }
+
+      if (!isReelAnimating && roomState.auctionState === "idle") {
+        populateStaticReelPreview();
+      } else {
+        hydrateReelImagesInPlace();
+      }
+
+      // 2. Bidding Podium
+      const spinBtn = document.getElementById("btnSpinReel");
+      const liveBidBtns = document.getElementById("liveBidButtons");
+      const metricsBox = document.getElementById("bidMetricsBox");
+      const lotTitle = document.getElementById("bidLotTitle");
+      const lotSub = document.getElementById("bidLotSub");
+      const lotThumb = document.getElementById("bidLotThumb");
+      const isMyTurn = !roomState.turnPlayerId || roomState.turnPlayerId === myPlayerId;
+      const turnName = roomState.turnPlayerName || "Oyuncu";
+
+      if (roomState.auctionState === "idle") {
+        spinBtn.style.display = "inline-flex";
+        spinBtn.disabled = !isMyTurn;
+        spinBtn.textContent = isMyTurn ? "⟳ Şeridi Döndür (Sıra Sende)" : `⏳ Sıra: ${turnName}`;
+        liveBidBtns.style.display = "none";
+        metricsBox.style.display = "none";
+        lotThumb.style.display = "none";
+        lotThumb.innerHTML = "";
+        lotTitle.textContent = isMyTurn ? "Sıra Sende! Şeridi Döndür" : `Sıra ${turnName} Oyuncusunda`;
+        lotSub.textContent = isMyTurn
+          ? "Kimse artırmazsa çıkan isim 1 ₺ taban fiyatla sende kalır"
+          : `${turnName} şeridi döndürecek (Kimse artırmazsa 1 ₺ ile onda kalır)`;
+      } else if (roomState.auctionState === "spinning") {
+        spinBtn.style.display = "inline-flex";
+        spinBtn.disabled = true;
+        spinBtn.textContent = "⟳ Şerit Dönüyor...";
+        liveBidBtns.style.display = "none";
+        metricsBox.style.display = "none";
+        lotThumb.style.display = "none";
+        lotThumb.innerHTML = "";
+        lotTitle.textContent = "Şerit Dönüyor...";
+        lotSub.textContent = `Sıra: ${turnName} — Sıradaki karakter belirleniyor`;
+      } else if (roomState.auctionState === "bidding" && roomState.currentEntry) {
+        spinBtn.style.display = "none";
+        liveBidBtns.style.display = "";
+        metricsBox.style.display = "flex";
+        lotThumb.style.display = "block";
+
+        const entry = roomState.currentEntry;
+        lotTitle.textContent = entry.name;
+        lotSub.textContent = `Sıra: ${turnName} (Kimse artırmazsa 1 ₺ ile sıra sahibinde kalır)`;
+        const img = entry.image || (roomState.imageCache && roomState.imageCache[entry.name]);
+        lotThumb.innerHTML = img
+          ? `<img src="${img}" alt="" referrerpolicy="no-referrer" />`
+          : `<div class="reel-monogram" style="font-size:15px">${getInitials(entry.name)}</div>`;
+
+        document.getElementById("bidHighestVal").textContent = `${roomState.highestBid} ₺`;
+        document.getElementById("bidLeaderName").textContent = roomState.highestBidderName || turnName;
+        startLocalCountdown(roomState.bidRemainingSec);
+      }
+
+      // 3. My Personal Console (Only renders configured baseCapacity slots!)
+      const me = roomState.me;
+      if (me) {
+        document.getElementById("myConsoleName").textContent = `${me.name} — Kadrom`;
+        document.getElementById("myRosterCounter").textContent = `${me.purchases.length} / ${me.capacity}`;
+        document.getElementById("myBudgetVal").textContent = `${me.budget} ₺`;
+        document.getElementById("myPointsVal").textContent = `${me.sessionPoints} P`;
+
+        const myBadges = [];
+        if (roomState.turnPlayerId === myPlayerId) myBadges.push('<span class="badge-status" style="background:rgba(245,158,11,0.2);color:var(--gold)">SIRA SENDE</span>');
+        if (me.hasShield) myBadges.push('<span class="badge-status st-shield">KALKAN</span>');
+        if (me.isFrozen) myBadges.push('<span class="badge-status st-freeze">DONDURULDUN</span>');
+        if (me.hasBlackCurse) myBadges.push('<span class="badge-status st-curse">KARA LANET</span>');
+        if (me.silencedRounds > 0) myBadges.push(`<span class="badge-status" style="background:rgba(168,85,247,0.25);color:#C084FC;border:1px solid rgba(168,85,247,0.4)">MÜHÜRLENDİN (${me.silencedRounds} Tur)</span>`);
+        document.getElementById("myStatusBadges").innerHTML = myBadges.join("");
+
+        const rGrid = document.getElementById("myRosterGrid");
+        rGrid.innerHTML = "";
+        const totalSlotsToShow = me.baseCapacity || roomState.rosterCapacity || 5;
+        for (let i = 0; i < totalSlotsToShow; i++) {
+          const slot = document.createElement("div");
+          if (i >= me.capacity) {
+            slot.className = "slot-box debuff-locked";
+            slot.textContent = "Kayıp Slot";
+          } else if (i < me.purchases.length) {
+            const pur = me.purchases[i];
+            const img = pur.image || (roomState.imageCache && roomState.imageCache[pur.name]);
+            slot.className = "slot-box";
+            slot.innerHTML = `
+              <div class="slot-thumb">
+                ${img ? `<img src="${img}" alt="" referrerpolicy="no-referrer" />` : `<div class="reel-monogram" style="font-size:16px">${getInitials(pur.name)}</div>`}
+              </div>
+              <div class="slot-label" title="${escapeHtml(pur.name)}">${escapeHtml(pur.name)}</div>
+              <div class="slot-sub">${pur.price} ₺</div>
+            `;
+          } else {
+            slot.className = "slot-box empty";
+            slot.textContent = `Slot ${i + 1}`;
+          }
+          rGrid.appendChild(slot);
+        }
+
+        // Secret Hand 5 Slots
+        const hGrid = document.getElementById("mySecretHandGrid");
+        hGrid.innerHTML = "";
+        for (let i = 0; i < 5; i++) {
+          const card = me.inventory[i];
+          const slot = document.createElement("div");
+          if (card) {
+            const isSilenced = me.silencedRounds > 0;
+            slot.className = isSilenced ? "slot-box interactive debuff-locked" : "slot-box interactive";
+            slot.title = isSilenced
+              ? `🔒 MÜHÜRLÜ (${me.silencedRounds} tur boyunca gizli kart kullanamazsın)`
+              : `${card.cardName}: ${card.description} (Oynamak için tıkla)`;
+            slot.onclick = () => onSecretCardClicked(i, card);
+            slot.innerHTML = `
+              <div class="slot-thumb card-slot-thumb" style="${isSilenced ? 'opacity:0.45;filter:grayscale(0.6)' : ''}">
+                <img src="${card.image}" alt="${escapeHtml(card.cardName)}" />
+              </div>
+              <div class="slot-label" style="color:${isSilenced ? '#C084FC' : 'var(--gold)'}">${escapeHtml(card.cardName)}</div>
+              <div class="slot-sub" style="color:${isSilenced ? '#C084FC' : 'var(--text-muted)'};font-size:9px">${isSilenced ? `🔒 MÜHÜRLÜ (${me.silencedRounds}T)` : 'KULLAN'}</div>
+            `;
+          } else {
+            slot.className = "slot-box empty";
+            slot.textContent = "Boş Kart";
+          }
+          hGrid.appendChild(slot);
+        }
+      }
+
+      if (document.getElementById("shopModal").classList.contains("open")) {
+        renderShopItems();
+      }
+    }
+
+    // =========================================================================
+    // CS HORIZONTAL REEL
+    // =========================================================================
+    function buildReelCardHtml(item) {
+      const img = item.image || (roomState?.imageCache && roomState.imageCache[item.name]);
+      const isContain = /godzilla|king kong|dinozor|araba|uçak|bina|robot/i.test(item.name);
+      const boxClass = isContain ? "reel-img-box contain-mode" : "reel-img-box";
+
+      const visual = img
+        ? `<img class="reel-img-blur" src="${img}" alt="" referrerpolicy="no-referrer" />
+           <img class="reel-img-main" src="${img}" alt="${escapeHtml(item.name)}" referrerpolicy="no-referrer" />`
+        : `<div class="reel-monogram">${getInitials(item.name)}</div>`;
+
+      return `
+        <div class="reel-card tier-${item.tier || 'mavi'}">
+          <div class="${boxClass}" data-item-name="${escapeHtml(item.name)}">${visual}</div>
+          <div class="reel-item-name">${escapeHtml(item.name)}</div>
+        </div>
+      `;
+    }
+
+    function hydrateReelImagesInPlace() {
+      if (!roomState || !roomState.imageCache) return;
+      document.querySelectorAll(".reel-img-box[data-item-name]").forEach(box => {
+        if (!box.querySelector(".reel-monogram")) return;
+        const name = box.getAttribute("data-item-name");
+        const img = roomState.imageCache[name];
+        if (img) {
+          box.innerHTML = `<img class="reel-img-blur" src="${img}" alt="" referrerpolicy="no-referrer" />
+            <img class="reel-img-main" src="${img}" alt="${escapeHtml(name)}" referrerpolicy="no-referrer" />`;
+        }
+      });
+    }
+
+    function populateStaticReelPreview() {
+      const track = document.getElementById("reelTrack");
+      if (!roomState || !roomState.poolNames.length) return;
+      const items = [];
+      for (let i = 0; i < 20; i++) {
+        const name = roomState.poolNames[i % roomState.poolNames.length];
+        items.push({ name, image: roomState.imageCache?.[name], tier: "mavi" });
+      }
+      track.style.transform = "translateX(0px)";
+      track.innerHTML = items.map(buildReelCardHtml).join("");
+    }
+
+    function runSynchronizedReelSpin(msg) {
+      isReelAnimating = true;
+      const track = document.getElementById("reelTrack");
+      const viewport = document.getElementById("reelViewport");
+
+      track.innerHTML = msg.reel.map(buildReelCardHtml).join("");
+      track.style.transform = "translateX(0px)";
+
+      const firstCardEl = track.querySelector(".reel-card");
+      const cardRectWidth = firstCardEl ? firstCardEl.getBoundingClientRect().width : 144;
+      const fullCardWidth = cardRectWidth + 8; // kart genişliği + 4px sol + 4px sağ margin
+      const maxOffset = Math.floor(cardRectWidth * 0.34);
+      const safeOffset = Math.max(-maxOffset, Math.min(maxOffset, msg.offsetPx || 0));
+      const centerLine = viewport.offsetWidth / 2;
+      const cardCenter = (msg.winnerIndex * fullCardWidth) + (fullCardWidth / 2) + 10 + safeOffset;
+      const targetTranslateX = -(cardCenter - centerLine);
+
+      const durationMs = msg.durationMs || 4600;
+      const startTime = performance.now();
+      let lastTickIndex = 0;
+
+      function easeOut(t) {
+        return 1 - Math.pow(1 - t, 4.3);
+      }
+
+      function step(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / durationMs, 1);
+        const eased = easeOut(progress);
+        const currentX = targetTranslateX * eased;
+        track.style.transform = `translateX(${currentX}px)`;
+
+        const pointerX = Math.abs(currentX) + centerLine - 10;
+        const idx = Math.floor(pointerX / fullCardWidth);
+        if (idx > lastTickIndex && idx < msg.reel.length) {
+          playMechanicalTick();
+          lastTickIndex = idx;
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          isReelAnimating = false;
+        }
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    function startLocalCountdown(initialSec) {
+      if (localTimerInterval) clearInterval(localTimerInterval);
+      let rem = initialSec;
+      const el = document.getElementById("bidTimerVal");
+      el.textContent = `${rem.toFixed(1)}s`;
+      localTimerInterval = setInterval(() => {
+        if (!roomState || roomState.auctionState !== "bidding") {
+          clearInterval(localTimerInterval);
+          return;
+        }
+        rem = Math.max(0, rem - 0.1);
+        el.textContent = `${rem.toFixed(1)}s`;
+      }, 100);
+    }
+
+    // =========================================================================
+    // ACTIONS
+    // =========================================================================
+    function scheduleSetupSync() {
+      if (setupSyncTimer) clearTimeout(setupSyncTimer);
+      setupSyncTimer = setTimeout(pushSetupUpdate, 350);
+    }
+
+    function pushSetupUpdate() {
+      if (!ws || !roomState || roomState.hostId !== myPlayerId) return;
+      ws.send(JSON.stringify({
+        action: "update_settings",
+        scenario: document.getElementById("setupScenario").value,
+        startingBudget: parseInt(document.getElementById("setupBudget").value || "30", 10),
+        rosterCapacity: parseInt(document.getElementById("setupCapacity").value || "5", 10),
+        bidTimerSeconds: parseInt(document.getElementById("setupTimer").value || "14", 10),
+        apiKey: document.getElementById("setupApiKey").value,
+        poolText: document.getElementById("setupPoolTextarea").value,
+      }));
+    }
+
+    function sendRemovePlayer(targetId) {
+      ws?.send(JSON.stringify({ action: "remove_player", targetId }));
+    }
+
+    function quickAiPrompt(text) {
+      document.getElementById("aiChatInput").value = text;
+      sendAiPoolPrompt();
+    }
+
+    function sendAiPoolPrompt() {
+      const inp = document.getElementById("aiChatInput");
+      const text = inp.value.trim();
+      if (!text || !ws) return;
+      const apiKey = document.getElementById("setupApiKey").value.trim();
+      inp.value = "";
+      ws.send(JSON.stringify({ action: "ai_pool_chat", prompt: text, apiKey }));
+    }
+
+    function sendStartGame() {
+      pushSetupUpdate();
+      ws?.send(JSON.stringify({ action: "start_game" }));
+    }
+
+    function sendSpin() {
+      ws?.send(JSON.stringify({ action: "spin" }));
+    }
+
+    function placeQuickBid(delta) {
+      if (!roomState) return;
+      if (roomState.me && roomState.me.purchases && roomState.me.capacity && roomState.me.purchases.length >= roomState.me.capacity) {
+        showToast("Takım kadron zaten 5/5 dolu! Parası kalsa dahi kadrosunu dolduranlar teklif veremez.");
+        return;
+      }
+      const amount = (roomState.highestBid || 0) + delta;
+      ws?.send(JSON.stringify({ action: "bid", amount }));
+    }
+
+    function placeCustomBid() {
+      if (roomState.me && roomState.me.purchases && roomState.me.capacity && roomState.me.purchases.length >= roomState.me.capacity) {
+        showToast("Takım kadron zaten 5/5 dolu! Parası kalsa dahi kadrosunu dolduranlar teklif veremez.");
+        return;
+      }
+      const val = parseInt(document.getElementById("customBidAmount").value || "0", 10);
+      if (val > 0) {
+        ws?.send(JSON.stringify({ action: "bid", amount: val }));
+        document.getElementById("customBidAmount").value = "";
+      }
+    }
+
+    function sendPassBid() {
+      ws?.send(JSON.stringify({ action: "pass_bid" }));
+    }
+
+    function sendUndo() {
+      ws?.send(JSON.stringify({ action: "undo" }));
+    }
+
+    function sendReturnLobby() {
+      ws?.send(JSON.stringify({ action: "return_to_lobby" }));
+    }
+
+    function onSecretCardClicked(slotIndex, card) {
+      if (roomState?.me?.silencedRounds > 0) {
+        showToast(`Mühürlendin! ${roomState.me.silencedRounds} tur boyunca gizli kart kullanamazsın.`);
+        return;
+      }
+      if (card.targetType === "SingleTargetPlayer") {
+        pendingCardSlot = slotIndex;
+        const opponents = (roomState?.players || []).filter(p => p.id !== myPlayerId);
+        if (!opponents.length) {
+          showToast("Masada hedeflenecek başka rakip yok!");
+          return;
+        }
+        document.getElementById("targetModalTitle").textContent = `${card.cardName} — Hedef Seç`;
+        const list = document.getElementById("targetListContainer");
+        list.innerHTML = "";
+        opponents.forEach(opp => {
+          const btn = document.createElement("button");
+          btn.className = "btn";
+          btn.style.justifyContent = "space-between";
+          btn.style.padding = "12px 14px";
+          btn.innerHTML = `
+            <span>${escapeHtml(opp.name)}</span>
+            <span style="color:#34D399;font-family:'JetBrains Mono'">${opp.budget} ₺ • Kadro: ${opp.purchases.length}/${opp.capacity}</span>
+          `;
+          btn.onclick = () => {
+            ws?.send(JSON.stringify({ action: "use_card", slotIndex: pendingCardSlot, targetId: opp.id }));
+            closeTargetModal();
+          };
+          list.appendChild(btn);
+        });
+        document.getElementById("targetModal").classList.add("open");
+      } else {
+        ws?.send(JSON.stringify({ action: "use_card", slotIndex, targetId: null }));
+      }
+    }
+
+    function closeTargetModal() {
+      document.getElementById("targetModal").classList.remove("open");
+      pendingCardSlot = null;
+    }
+
+    function openShopModal() {
+      renderShopItems();
+      document.getElementById("shopModal").classList.add("open");
+    }
+
+    function closeShopModal() {
+      document.getElementById("shopModal").classList.remove("open");
+    }
+
+    let activeShopCategory = "all";
+    let selectedDetailCardID = null;
+
+    function filterShopCategory(cat) {
+      activeShopCategory = cat;
+      document.querySelectorAll(".shop-tab").forEach(t => {
+        t.classList.toggle("active", t.getAttribute("data-cat") === cat);
+      });
+      renderShopItems();
+    }
+
+    function openCardDetail(cardID) {
+      if (!roomState || !roomState.cardsCatalog) return;
+      const card = roomState.cardsCatalog.find(c => c.cardID === cardID);
+      if (!card) return;
+      selectedDetailCardID = cardID;
+
+      const me = roomState.me;
+      const inHand = me?.inventory.some(c => c && c.cardID === card.cardID);
+      const cdRem = me?.cooldowns?.[card.cardID] || 0;
+      const handFull = me?.inventory.every(c => c !== null);
+      const noPoints = (me?.sessionPoints || 0) < card.pointCost;
+
+      document.getElementById("cardDetailTitle").textContent = card.cardName;
+      const imgEl = document.getElementById("cardDetailImg");
+      imgEl.src = card.image;
+      imgEl.alt = card.cardName;
+
+      const catBadge = document.getElementById("cardDetailCatBadge");
+      const catClass = card.category || "odul";
+      catBadge.className = `shop-card-cat-badge cat-badge-${catClass}`;
+      catBadge.textContent = `${card.categoryIcon || '🃏'} ${card.categoryLabel || 'Kart'}`;
+
+      const targetLabel = card.targetType === "Self" ? "🛡️ Kendine" : card.targetType === "Global" ? "🌐 Tüm Masa" : "🎯 Seçilen Rakip";
+      document.getElementById("cardDetailTargetBadge").textContent = targetLabel;
+      document.getElementById("cardDetailCooldownBadge").textContent = `⏳ ${card.cooldown} Tur Bekleme`;
+      document.getElementById("cardDetailDesc").textContent = card.description;
+      document.getElementById("cardDetailCost").textContent = `${card.pointCost} P`;
+
+      const buyBtn = document.getElementById("cardDetailBuyBtn");
+      let btnLabel = "SATIN AL";
+      let disabled = false;
+      if (inHand) { btnLabel = "Elinde Mevcut"; disabled = true; }
+      else if (cdRem > 0) { btnLabel = `Beklemede (${cdRem} Tur)`; disabled = true; }
+      else if (handFull) { btnLabel = "Slot Dolu (5/5)"; disabled = true; }
+      else if (noPoints) { btnLabel = "Yetersiz Puan"; disabled = true; }
+
+      buyBtn.textContent = btnLabel;
+      buyBtn.disabled = disabled;
+      buyBtn.className = `btn ${disabled ? '' : 'btn-gold'}`;
+
+      document.getElementById("cardDetailModal").classList.add("open");
+    }
+
+    function closeCardDetailModal() {
+      document.getElementById("cardDetailModal").classList.remove("open");
+      selectedDetailCardID = null;
+    }
+
+    function buyCardFromDetail() {
+      if (selectedDetailCardID) {
+        buyCard(selectedDetailCardID);
+        closeCardDetailModal();
+      }
+    }
+
+    function renderShopItems() {
+      if (!roomState || !roomState.me) return;
+      const me = roomState.me;
+      document.getElementById("shopModalPoints").textContent = `${me.sessionPoints} P`;
+
+      const catalog = roomState.cardsCatalog || [];
+      const countEl = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
+      countEl("tabCountAll", catalog.length);
+      countEl("tabCountOdul", catalog.filter(c => c.category === "odul").length);
+      countEl("tabCountCeza", catalog.filter(c => c.category === "ceza").length);
+      countEl("tabCountSavunma", catalog.filter(c => c.category === "savunma").length);
+      countEl("tabCountLanet", catalog.filter(c => c.category === "lanet").length);
+
+      const container = document.getElementById("shopGridContainer");
+      container.innerHTML = "";
+
+      const filteredCards = catalog.filter(c => activeShopCategory === "all" || c.category === activeShopCategory);
+
+      if (filteredCards.length === 0) {
+        container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:36px 12px;color:var(--text-muted)">Bu kategoride kart bulunamadı.</div>`;
+        return;
+      }
+
+      filteredCards.forEach(card => {
+        const inHand = me.inventory.some(c => c && c.cardID === card.cardID);
+        const cdRem = me.cooldowns?.[card.cardID] || 0;
+        const handFull = me.inventory.every(c => c !== null);
+        const noPoints = me.sessionPoints < card.pointCost;
+
+        let btnLabel = "Satın Al";
+        let disabled = false;
+        if (inHand) { btnLabel = "Elinde Mevcut"; disabled = true; }
+        else if (cdRem > 0) { btnLabel = `Beklemede (${cdRem} Tur)`; disabled = true; }
+        else if (handFull) { btnLabel = "Slot Dolu (5/5)"; disabled = true; }
+        else if (noPoints) { btnLabel = "Yetersiz Puan"; disabled = true; }
+
+        const targetLabel = card.targetType === "Self" ? "🛡️ Kendine" : card.targetType === "Global" ? "🌐 Tüm Masa" : "🎯 Rakip";
+        const catClass = card.category || "odul";
+
+        const tile = document.createElement("div");
+        tile.className = `shop-card cat-${catClass}`;
+        tile.innerHTML = `
+          <div class="shop-card-img-wrap" onclick="openCardDetail('${card.cardID}')" title="Büyük boyutta incelemek için tıkla">
+            <img src="${card.image}" alt="${escapeHtml(card.cardName)}" />
+            <span class="shop-card-zoom-badge">🔍 İncele</span>
+          </div>
+          <div class="shop-card-body">
+            <div>
+              <div class="shop-card-header">
+                <div class="shop-card-title-group">
+                  <span class="shop-card-cat-badge cat-badge-${catClass}">
+                    ${card.categoryIcon || '🃏'} ${card.categoryLabel || 'Kart'}
+                  </span>
+                  <strong class="shop-card-name" onclick="openCardDetail('${card.cardID}')">${escapeHtml(card.cardName)}</strong>
+                </div>
+                <span class="shop-card-price">${card.pointCost} P</span>
+              </div>
+              <div class="shop-card-desc" style="margin-top:5px">${escapeHtml(card.description)}</div>
+            </div>
+            <div>
+              <div class="shop-card-meta" style="margin-bottom:6px">
+                <span>${targetLabel}</span>
+                <span>•</span>
+                <span>⏳ ${card.cooldown} Tur</span>
+              </div>
+              <button class="btn ${disabled ? '' : 'btn-gold'}" style="width:100%;padding:7px;font-size:12px" ${disabled ? 'disabled' : ''} onclick="buyCard('${card.cardID}')">
+                ${btnLabel}
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(tile);
+      });
+    }
+
+    function buyCard(cardID) {
+      ws?.send(JSON.stringify({ action: "buy_card", cardID }));
+    }
+
+    function renderJudgeModal() {
+      const modal = document.getElementById("judgeModal");
+      const body = document.getElementById("judgeModalBody");
+      modal.classList.add("open");
+
+      if (roomState.judgeEvaluating) {
+        body.innerHTML = `
+          <div style="text-align:center;padding:44px 20px">
+            <h2 style="color:var(--gold);margin-bottom:8px">Jüri Takımları Değerlendiriyor...</h2>
+            <p style="color:var(--text-muted);font-size:14px">Senaryo uyumu, fonksiyonel rol dağılımı ve takım sinerjisi analiz ediliyor.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const res = roomState.judgeResult;
+      if (!res) return;
+
+      const scoresHtml = (res.TeamScores || []).map((ts, idx) => `
+        <div style="background:var(--bg-input);border:1px solid ${idx===0?'var(--gold)':'var(--border)'};border-radius:8px;padding:12px 14px;margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <strong style="font-size:14px;color:var(--text-main)">#${idx + 1} ${escapeHtml(ts.PlayerName)}</strong>
+            <div style="display:flex;gap:12px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700">
+              <span style="color:#34D399">Skor: ${ts.TotalScore}/100</span>
+              <span style="color:var(--gold)">+${ts.AwardedPoints ?? ts.TotalScore} P</span>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text-sub);line-height:1.45">${escapeHtml(ts.Reason || '')}</div>
+        </div>
+      `).join("");
+
+      body.innerHTML = `
+        <div style="background:var(--bg-input);border:1px solid var(--gold);border-radius:10px;padding:16px;text-align:center;margin-bottom:12px">
+          <div style="font-size:11px;color:var(--gold);text-transform:uppercase;font-weight:800">ŞAMPİYON: ${escapeHtml(res.WinnerPlayerName || '-')}</div>
+          <h2 style="font-size:20px;color:var(--text-main);margin-top:4px">${escapeHtml(res.Headline || '')}</h2>
+        </div>
+
+        <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:6px">"${escapeHtml(res.FunnyComment || '')}"</div>
+          <div style="font-size:12px;color:var(--text-sub);line-height:1.5">${escapeHtml(res.Analysis || '')}</div>
+        </div>
+
+        <div>${scoresHtml}</div>
+      `;
+    }
+
+    function closeJudgeModal() {
+      document.getElementById("judgeModal").classList.remove("open");
+    }
+
+    function getInitials(name) {
+      return (name || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>

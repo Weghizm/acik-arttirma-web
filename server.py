@@ -829,13 +829,42 @@ async def start_spin_sequence(room: Room):
 
     total_cards = 68
     win_idx = 52
-    reel = []
+    candidates = list(avail) if len(avail) >= 3 else list(room.pool_entries)
+    if not candidates:
+        candidates = [winner]
+
+    window_size = min(3, len(candidates) - 1) if len(candidates) > 1 else 0
+    reel_raw: List[Optional[Dict[str, Any]]] = [None] * total_cards
+    reel_raw[win_idx] = winner
+
     for i in range(total_cards):
         if i == win_idx:
-            item = winner
-        else:
-            pick = random.choice(avail) if len(avail) >= 3 else random.choice(room.pool_entries)
-            item = pick
+            continue
+        recent_names = set()
+        for offset in range(1, window_size + 1):
+            if i - offset >= 0 and reel_raw[i - offset] is not None:
+                recent_names.add(reel_raw[i - offset]["name"])
+        if i == win_idx - 1:
+            recent_names.add(winner["name"])
+
+        valid = [c for c in candidates if c["name"] not in recent_names]
+        if not valid:
+            prev_name = reel_raw[i - 1]["name"] if i > 0 and reel_raw[i - 1] is not None else None
+            valid = [c for c in candidates if c["name"] != prev_name]
+            if not valid:
+                valid = candidates
+
+        reel_raw[i] = random.choice(valid)
+
+    # Sanity check: after win_idx, ensure win_idx + 1 is not the winner if multiple candidates exist
+    if win_idx + 1 < total_cards and len(candidates) > 1:
+        if reel_raw[win_idx + 1]["name"] == winner["name"]:
+            valid = [c for c in candidates if c["name"] != winner["name"]]
+            if valid:
+                reel_raw[win_idx + 1] = random.choice(valid)
+
+    reel = []
+    for item in reel_raw:
         reel.append({
             "id": item["id"],
             "name": item["name"],

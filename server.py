@@ -341,20 +341,29 @@ def save_image_cache_to_disk() -> None:
 
 # Common single-word entities that require specific disambiguation anchors
 DISAMBIGUATION_ANCHORS = {
-    "maximus": "Maximus Gladiator character portrait",
-    "arthur morgan": "Arthur Morgan Red Dead Redemption 2 portrait",
-    "joker": "Joker DC character portrait",
-    "blade": "Blade Marvel character portrait",
-    "flash": "The Flash DC superhero portrait",
-    "thor": "Thor Marvel character portrait",
-    "ezel": "Ezel Bayraktar dizi portrait",
-    "ramiz dayı": "Ramiz Karaeski Dayı Ezel portrait",
-    "polat alemdar": "Polat Alemdar Kurtlar Vadisi portrait",
-    "recep ivedik": "Recep İvedik film portrait",
-    "süleyman çakır": "Süleyman Çakır Kurtlar Vadisi portrait",
-    "memati baş": "Memati Baş Kurtlar Vadisi portrait",
-    "vito corleone": "Vito Corleone Godfather portrait",
-    "walter white": "Walter White Breaking Bad portrait",
+    "maximus": "Maximus Gladiator",
+    "kratos": "Kratos God of War",
+    "ezel": "Ezel Kenan İmirzalıoğlu",
+    "arthur morgan": "Arthur Morgan RDR2",
+    "tyler durden": "Tyler Durden Fight Club",
+    "joker": "Joker DC",
+    "blade": "Blade Marvel",
+    "flash": "The Flash DC",
+    "thor": "Thor Marvel",
+    "vito corleone": "Vito Corleone Godfather",
+    "tony montana": "Tony Montana Scarface",
+    "hannibal lecter": "Hannibal Lecter",
+    "lara croft": "Lara Croft Tomb Raider",
+    "james bond": "James Bond 007",
+    "walter white": "Walter White Breaking Bad",
+    "darth vader": "Darth Vader Star Wars",
+    "john wick": "John Wick Keanu Reeves",
+    "geralt of rivia": "Geralt of Rivia Witcher",
+    "polat alemdar": "Polat Alemdar Kurtlar Vadisi",
+    "süleyman çakır": "Süleyman Çakır Kurtlar Vadisi",
+    "memati baş": "Memati Baş Kurtlar Vadisi",
+    "ramiz dayı": "Ramiz Karaeski Ezel",
+    "recep ivedik": "Recep İvedik",
 }
 
 # Negative keywords: reject results containing coins, anatomy, contractors, maps, or clipart logos
@@ -373,33 +382,29 @@ def resolve_wiki_image_sync(term: str) -> Optional[str]:
         return IMAGE_CACHE[key]
 
     k_lower = key.lower()
+    anchored = DISAMBIGUATION_ANCHORS.get(k_lower, key)
 
-    # Generate prioritized candidate queries for dynamic search
-    queries = []
-    if k_lower in DISAMBIGUATION_ANCHORS:
-        queries.append(DISAMBIGUATION_ANCHORS[k_lower])
-
-    if any(w in k_lower for w in ["character", "karakter", "film", "dizi", "oyun", "movie", "game"]):
-        queries.append(f"{key} portrait")
-        queries.append(key)
-    else:
-        queries.append(f"{key} character portrait")
-        queries.append(f"{key} portrait")
-        queries.append(f"{key} dizi film")
-        queries.append(key)
+    # 1. Primary: Curated aesthetic Pinterest-indexed portraits & wallpapers
+    queries = [
+        f"{anchored} pinterest portrait",
+        f"{anchored} pinterest wallpaper",
+        f"{anchored} character portrait",
+        f"{anchored} portrait",
+        anchored,
+    ]
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         "Accept-Language": "tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7",
     }
 
-    # 1. Primary: Microsoft Bing Images Engine with Turkish locale context and smart filtering
+    # Search engine with Pinterest aesthetic targeting and letterbox-free delivery
     for q in queries:
         try:
             bing_url = (
                 "https://www.bing.com/images/async?q="
                 + urllib.parse.quote(q)
-                + "&first=0&count=12&adlt=off&cc=tr&setlang=tr"
+                + "&first=0&count=10&adlt=off"
             )
             req = urllib.request.Request(bing_url, headers=headers)
             with urllib.request.urlopen(req, timeout=3.5) as resp:
@@ -420,7 +425,6 @@ def resolve_wiki_image_sync(term: str) -> Optional[str]:
                             continue
 
                         # Clean thumbnail URL: preserve native ratio without white letterboxing!
-                        # NEVER append &w=400&h=400 which forces Bing to pad white borders!
                         clean_url = turl.split("&w=")[0].split("&h=")[0]
                         if "&pid=" not in clean_url:
                             clean_url += "&pid=15.1"

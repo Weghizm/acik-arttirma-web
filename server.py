@@ -810,8 +810,8 @@ async def apply_player_bid(room: Room, player: Player, amount: int) -> Optional[
         return "Şu anda aktif bir teklif turu yok."
     if player.is_frozen:
         return "Bu tur DONDURULDUN! Teklif veremezsin."
-    if player.is_roster_full:
-        return "Takım kadron tamamen dolu!"
+    if player.is_roster_full or len(player.purchases) >= player.capacity:
+        return "Takım kadron zaten tamamen dolu! Parası kalsa dahi kadrosunu tamamlayanlar teklif veremez."
     if amount <= room.highest_bid:
         return f"Teklif mevcut en yüksek tekliften ({room.highest_bid} ₺) büyük olmalı."
     if amount > player.budget:

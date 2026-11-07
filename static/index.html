@@ -2427,11 +2427,19 @@
 
     function placeQuickBid(delta) {
       if (!roomState) return;
+      if (roomState.me && roomState.me.purchases && roomState.me.capacity && roomState.me.purchases.length >= roomState.me.capacity) {
+        showToast("Takım kadron zaten 5/5 dolu! Parası kalsa dahi kadrosunu dolduranlar teklif veremez.");
+        return;
+      }
       const amount = (roomState.highestBid || 0) + delta;
       ws?.send(JSON.stringify({ action: "bid", amount }));
     }
 
     function placeCustomBid() {
+      if (roomState.me && roomState.me.purchases && roomState.me.capacity && roomState.me.purchases.length >= roomState.me.capacity) {
+        showToast("Takım kadron zaten 5/5 dolu! Parası kalsa dahi kadrosunu dolduranlar teklif veremez.");
+        return;
+      }
       const val = parseInt(document.getElementById("customBidAmount").value || "0", 10);
       if (val > 0) {
         ws?.send(JSON.stringify({ action: "bid", amount: val }));

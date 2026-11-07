@@ -680,6 +680,8 @@ class Room:
         self.starting_budget = 30
         self.roster_capacity = 5
         self.bid_timer_seconds = 14
+        self.auction_type = "mixed"  # "mixed", "classic", "dutch"
+        self.round_mode = "classic"  # active round mode: "classic" or "dutch"
         self.gemini_api_key = DEFAULT_GEMINI_API_KEY
 
         self.players: List[Player] = []
@@ -787,6 +789,8 @@ class Room:
             "startingBudget": self.starting_budget,
             "rosterCapacity": self.roster_capacity,
             "bidTimerSeconds": self.bid_timer_seconds,
+            "auctionType": self.auction_type,
+            "roundMode": self.round_mode,
             "hasApiKey": bool(self.gemini_api_key or DEFAULT_GEMINI_API_KEY or EMBEDDED_GEMINI_API_KEY),
             "poolNames": self.pool_names,
             "poolCount": len(self.pool_names),
@@ -956,6 +960,14 @@ async def start_spin_sequence(room: Room):
             "tier": item.get("tier", "mavi"),
         })
 
+    # Determine round mode (Classic English or Dutch Reverse Auction)
+    if room.auction_type == "dutch":
+        room.round_mode = "dutch"
+    elif room.auction_type == "classic":
+        room.round_mode = "classic"
+    else:  # mixed mode: 38% surprise Dutch auction rounds
+        room.round_mode = "dutch" if random.random() < 0.38 else "classic"
+
     room.reel_sequence = reel
     room.reel_winner_index = win_idx
     room.reel_offset_px = round(random.uniform(-10.0, 10.0), 1)
@@ -966,6 +978,7 @@ async def start_spin_sequence(room: Room):
         "winnerIndex": win_idx,
         "offsetPx": room.reel_offset_px,
         "winner": winner,
+        "roundMode": room.round_mode,
         "durationMs": 4600,
     })
     await room.broadcast_state()
@@ -975,6 +988,30 @@ async def start_spin_sequence(room: Room):
     if room.auction_state != "spinning" or room.current_entry != winner:
         return
 
+    # 1. DUTCH (REVERSE) AUCTION FLOW
+    if room.round_mode == "dutch":
+        room.auction_state = "bidding"
+        active_budgets = [p.budget for p in room.players if not p.is_roster_full and not p.is_frozen]
+        max_b = max(active_budgets) if active_budgets else room.starting_budget
+        dutch_start = min(36, max(14, int(max_b * 0.95)))
+        room.highest_bid = dutch_start
+        room.highest_bidder_id = None
+        room.highest_bidder_name = None
+        room.bid_deadline = time.time() + 30.0
+
+        await room.broadcast_event({
+            "type": "toast",
+            "level": "warning",
+            "message": f"📉 TERS MÜZAYEDE BAŞLADI! {winner['name']} için fiyat {dutch_start} ₺'den düşüyor, ilk basan kapar!",
+        })
+        await room.broadcast_state()
+
+        if room.timer_task and not room.timer_task.done():
+            room.timer_task.cancel()
+        room.timer_task = asyncio.create_task(run_dutch_timer(room, winner["id"]))
+        return
+
+    # 2. CLASSIC AUCTION FLOW
     room.auction_state = "bidding"
     room.bid_deadline = time.time() + room.bid_timer_seconds
 
@@ -996,6 +1033,57 @@ async def start_spin_sequence(room: Room):
     room.timer_task = asyncio.create_task(run_bidding_timer(room, winner["id"]))
 
 
+async def run_dutch_timer(room: Room, entry_id: str):
+    try:
+        drop_interval = 0.95
+        while (room.phase == "playing" and 
+               room.auction_state == "bidding" and 
+               room.round_mode == "dutch" and 
+               room.current_entry and 
+               room.current_entry["id"] == entry_id and 
+               room.highest_bid > 1):
+            await asyncio.sleep(drop_interval)
+            if (room.phase != "playing" or 
+                room.auction_state != "bidding" or 
+                room.round_mode != "dutch" or 
+                not room.current_entry or 
+                room.current_entry["id"] != entry_id):
+                return
+
+            drop = 2 if room.highest_bid > 8 else 1
+            room.highest_bid = max(1, room.highest_bid - drop)
+            await room.broadcast_event({
+                "type": "dutch_tick",
+                "price": room.highest_bid,
+            })
+            await room.broadcast_state()
+
+        # Floor of 1 ₺ reached: give 4 seconds grace period
+        if (room.phase == "playing" and 
+            room.auction_state == "bidding" and 
+            room.round_mode == "dutch" and 
+            room.current_entry and 
+            room.current_entry["id"] == entry_id):
+            await asyncio.sleep(4.0)
+            if (room.phase == "playing" and 
+                room.auction_state == "bidding" and 
+                room.round_mode == "dutch" and 
+                room.current_entry and 
+                room.current_entry["id"] == entry_id):
+                entry = room.current_entry
+                entry["state"] = "passed"
+                room.auction_state = "idle"
+                await room.broadcast_event({
+                    "type": "passed",
+                    "entry": entry,
+                    "message": f"PAS GEÇİLDİ: {entry['name']} (1 ₺ fiyata dahi kimse almadı)",
+                })
+                room.advance_turn()
+                await room.broadcast_state()
+    except asyncio.CancelledError:
+        pass
+
+
 async def run_bidding_timer(room: Room, entry_id: str):
     try:
         while room.phase == "playing" and room.auction_state == "bidding" and room.current_entry and room.current_entry["id"] == entry_id:
@@ -1011,6 +1099,8 @@ async def run_bidding_timer(room: Room, entry_id: str):
 async def apply_player_bid(room: Room, player: Player, amount: int) -> Optional[str]:
     if room.phase != "playing" or room.auction_state != "bidding" or not room.current_entry:
         return "Şu anda aktif bir teklif turu yok."
+    if room.round_mode == "dutch":
+        return "Ters müzayedede teklif artırılamaz, hemen almak için '⚡ HEMEN KAP!' butonuna basın!"
     if player.is_frozen:
         return "Bu tur DONDURULDUN! Teklif veremezsin."
     if player.is_roster_full or len(player.purchases) >= player.capacity:
@@ -1591,6 +1681,8 @@ async def ws_endpoint(websocket: WebSocket, room_code: str, player_id: str):
                             p.capacity = room.roster_capacity
                     if "bidTimerSeconds" in data:
                         room.bid_timer_seconds = max(6, min(60, int(data["bidTimerSeconds"])))
+                    if "auctionType" in data and str(data["auctionType"]).strip() in ("mixed", "classic", "dutch"):
+                        room.auction_type = str(data["auctionType"]).strip()
                     if "apiKey" in data and str(data["apiKey"]).strip():
                         room.gemini_api_key = str(data["apiKey"]).strip()
                     if "poolText" in data:
@@ -1707,17 +1799,85 @@ async def ws_endpoint(websocket: WebSocket, room_code: str, player_id: str):
             elif action == "pass_bid":
                 p = room.get_player(player_id)
                 if p and room.auction_state == "bidding":
-                    active_count = sum(1 for x in room.players if not x.is_finished and not x.is_frozen)
-                    if active_count > 1 and p.id == room.highest_bidder_id:
+                    if room.round_mode == "dutch":
                         await websocket.send_json({
                             "type": "toast",
                             "level": "info",
-                            "message": "En yüksek teklif (veya 1 ₺ sıra tabanı) şu an sende! Başkası teklif verene kadar pas geçemezsin."
+                            "message": "Ters müzayedede pas geçilmez, fiyat otomatik düşer veya biri kapar."
                         })
                     else:
-                        p.passed_current_item = True
-                        await room.broadcast_state()
-                        await check_all_passed_or_resolved(room)
+                        active_count = sum(1 for x in room.players if not x.is_finished and not x.is_frozen)
+                        if active_count > 1 and p.id == room.highest_bidder_id:
+                            await websocket.send_json({
+                                "type": "toast",
+                                "level": "info",
+                                "message": "En yüksek teklif (veya 1 ₺ sıra tabanı) şu an sende! Başkası teklif verene kadar pas geçemezsin."
+                            })
+                        else:
+                            p.passed_current_item = True
+                            await room.broadcast_state()
+                            await check_all_passed_or_resolved(room)
+
+            elif action == "dutch_claim":
+                p = room.get_player(player_id)
+                if (p and room.phase == "playing" and 
+                    room.auction_state == "bidding" and 
+                    room.round_mode == "dutch" and 
+                    room.current_entry):
+                    
+                    if p.is_roster_full or len(p.purchases) >= p.capacity:
+                        await websocket.send_json({"type": "toast", "level": "danger", "message": "Takım kadronuz dolu olduğu için kart kapamazsınız!"})
+                        continue
+                    if p.is_frozen:
+                        await websocket.send_json({"type": "toast", "level": "danger", "message": "Bu tur DONDURULDUNUZ! Kart kapamazsınız."})
+                        continue
+                    if p.budget < room.highest_bid:
+                        await websocket.send_json({"type": "toast", "level": "danger", "message": f"Yetersiz bütçe! (Kalan: {p.budget} ₺, Fiyat: {room.highest_bid} ₺)"})
+                        continue
+
+                    if room.timer_task and not room.timer_task.done():
+                        room.timer_task.cancel()
+
+                    claim_price = room.highest_bid
+                    entry = room.current_entry
+                    p.budget -= claim_price
+                    entry["state"] = "sold"
+                    entry["buyerId"] = p.id
+                    entry["buyerName"] = p.name
+                    entry["price"] = claim_price
+                    p.purchases.append(entry)
+
+                    room.history_stack.append({
+                        "type": "sold",
+                        "entryId": entry["id"],
+                        "buyerId": p.id,
+                        "price": claim_price,
+                        "prevTurnIndex": room.turn_index,
+                    })
+
+                    room.auction_state = "idle"
+                    await room.broadcast_event({
+                        "type": "sold",
+                        "entry": entry,
+                        "buyer": p.name,
+                        "price": claim_price,
+                        "message": f"⚡ KAPILDI! {p.name}, {entry['name']} kartını {claim_price} ₺ karşılığında kaptı!",
+                    })
+                    room.advance_turn()
+                    await room.broadcast_state()
+
+            elif action == "reaction":
+                emoji = str(data.get("emoji", "")).strip()
+                valid_emojis = {"💸", "🔥", "😱", "🤡", "💀", "🍿"}
+                if emoji in valid_emojis:
+                    p = room.get_player(player_id)
+                    p_name = p.name if p else "Biri"
+                    await room.broadcast_event({
+                        "type": "reaction",
+                        "playerId": player_id,
+                        "playerName": p_name,
+                        "emoji": emoji,
+                    })
 
             elif action == "buy_card":
                 p = room.get_player(player_id)

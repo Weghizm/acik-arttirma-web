@@ -1174,6 +1174,230 @@
       margin: 0;
     }
 
+    /* TERS MÜZAYEDE (DUTCH) & REAKSİYON STILLERİ */
+    .dutch-bid-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .dutch-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #FBBF24;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+
+    .dutch-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #F59E0B;
+      box-shadow: 0 0 10px #F59E0B;
+      animation: pulseDutchDot 1s infinite alternate;
+    }
+
+    @keyframes pulseDutchDot {
+      0% { transform: scale(0.8); opacity: 0.6; }
+      100% { transform: scale(1.3); opacity: 1; }
+    }
+
+    .btn-dutch-claim {
+      width: 100%;
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #B45309 100%);
+      border: 2px solid #FDE68A;
+      border-radius: 14px;
+      padding: 10px 16px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s ease;
+      user-select: none;
+    }
+
+    .btn-dutch-claim:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(245, 158, 11, 0.6);
+    }
+
+    .btn-dutch-claim:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    .btn-dutch-claim:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(0.8);
+      transform: none;
+      box-shadow: none;
+    }
+
+    .dutch-claim-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .dutch-claim-icon {
+      font-size: 26px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    }
+
+    .dutch-claim-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      flex: 1;
+    }
+
+    .dutch-claim-title {
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .dutch-claim-sub {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #FEF3C7;
+      opacity: 0.9;
+    }
+
+    .dutch-claim-price {
+      background: #111827;
+      color: #FBBF24;
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      padding: 5px 12px;
+      border-radius: 10px;
+      font-size: 19px;
+      font-weight: 900;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .reactions-dock {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(15, 23, 42, 0.65);
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .reaction-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 17px;
+      line-height: 1;
+      padding: 3px 5px;
+      border-radius: 6px;
+      transition: transform 0.12s ease, background 0.12s ease;
+      user-select: none;
+    }
+
+    .reaction-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: scale(1.22);
+    }
+
+    .reaction-btn:active {
+      transform: scale(0.92);
+    }
+
+    .floating-reactions-container {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 80px;
+      top: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 9999;
+    }
+
+    .floating-reaction-bubble {
+      position: absolute;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: floatUpReaction 2.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6));
+    }
+
+    .reaction-emoji {
+      font-size: 36px;
+      line-height: 1;
+      animation: reactionWiggle 2.3s ease-in-out infinite alternate;
+    }
+
+    .reaction-sender {
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-top: 2px;
+      white-space: nowrap;
+      backdrop-filter: blur(4px);
+    }
+
+    @keyframes floatUpReaction {
+      0% {
+        transform: translateY(20px) scale(0.5);
+        opacity: 0;
+      }
+      15% {
+        transform: translateY(0px) scale(1.2);
+        opacity: 1;
+      }
+      30% {
+        transform: translateY(-40px) scale(1.0);
+        opacity: 1;
+      }
+      80% {
+        transform: translateY(-220px) scale(1.05);
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateY(-340px) scale(0.9);
+        opacity: 0;
+      }
+    }
+
+    @keyframes reactionWiggle {
+      0% { transform: rotate(-8deg); }
+      100% { transform: rotate(8deg); }
+    }
+
+    .price-pulse {
+      animation: pulsePrice 0.35s ease-out;
+    }
+
+    @keyframes pulsePrice {
+      0% { transform: scale(1.2); color: #F59E0B; }
+      100% { transform: scale(1); }
+    }
+
     /* ======================================================================
        3. ALT OYUNCU KONSOLU (Kendi Kadron & Gizli Kartların)
     ====================================================================== */
@@ -1969,6 +2193,7 @@
   </header>
 
   <div id="toastContainer"></div>
+  <div id="floatingReactionsContainer" class="floating-reactions-container"></div>
 
   <!-- ====================================================================
        VIEW 0: ENTRY GATE (Rastgele Gizli Masa Kur veya Koda Göre Katıl)
@@ -2051,6 +2276,15 @@
             <label class="field-label">Teklif Süresi (sn)</label>
             <input type="number" id="setupTimer" class="field-input" value="14" min="6" max="60" oninput="scheduleSetupSync()" />
           </div>
+        </div>
+
+        <div>
+          <label class="field-label">Müzayede Türü</label>
+          <select id="setupAuctionType" class="field-input" onchange="scheduleSetupSync()" style="font-weight:600">
+            <option value="mixed">⚡ Karışık Mod (Klasik + Sürpriz Ters Müzayede)</option>
+            <option value="classic">📈 Klasik Açık Arttırma (Fiyat Artar)</option>
+            <option value="dutch">📉 Ters Müzayede (Fiyat Düşer, İlk Basan Kapar!)</option>
+          </select>
         </div>
 
         <div>
@@ -2175,9 +2409,18 @@
         <div class="wallet-badge-row">
           <div class="wallet-label">
             <span class="wallet-dot"></span>
-            <span>Kasandaki Bütçen:</span>
+            <span>Kasandaki:</span>
+            <span class="wallet-val" id="myBottomBudgetVal">30 ₺</span>
           </div>
-          <span class="wallet-val" id="myBottomBudgetVal">30 ₺</span>
+
+          <div class="reactions-dock" id="reactionsDock">
+            <button type="button" class="reaction-btn" onclick="sendReaction('💸')" title="Para Saç">💸</button>
+            <button type="button" class="reaction-btn" onclick="sendReaction('🔥')" title="Alev Aldı">🔥</button>
+            <button type="button" class="reaction-btn" onclick="sendReaction('😱')" title="Şok">😱</button>
+            <button type="button" class="reaction-btn" onclick="sendReaction('🤡')" title="Palyaço">🤡</button>
+            <button type="button" class="reaction-btn" onclick="sendReaction('💀')" title="Öldüm">💀</button>
+            <button type="button" class="reaction-btn" onclick="sendReaction('🍿')" title="Mısır Patlat">🍿</button>
+          </div>
         </div>
 
         <!-- 3D TEKLİF BUTONLARI (+1 ₺ VE +3 ₺) -->
@@ -2189,6 +2432,24 @@
           <button class="btn-bid-plus3" onclick="placeQuickBid(3)">
             <span class="bid-btn-val">+3 ₺</span>
             <span class="bid-btn-sub">Baskı Kur 🔥</span>
+          </button>
+        </div>
+
+        <!-- TERS MÜZAYEDE (DUTCH) HEMEN KAP BUTONU -->
+        <div id="dutchBidButtons" class="dutch-bid-panel" style="display:none">
+          <div class="dutch-badge-pill">
+            <span class="dutch-pulse"></span>
+            <span>📉 TERS MÜZAYEDE • FİYAT DÜŞÜYOR!</span>
+          </div>
+          <button id="btnDutchClaim" class="btn-dutch-claim" onclick="sendDutchClaim()">
+            <div class="dutch-claim-content">
+              <span class="dutch-claim-icon">⚡</span>
+              <div class="dutch-claim-text">
+                <span class="dutch-claim-title">HEMEN KAP!</span>
+                <span class="dutch-claim-sub">İlk basan alır</span>
+              </div>
+              <span class="dutch-claim-price" id="dutchClaimPrice">0 ₺</span>
+            </div>
           </button>
         </div>
 
@@ -2217,7 +2478,7 @@
           </div>
           <button type="button" class="btn-toggle-secret-cards" onclick="toggleSecretCardsSheet()">
             <span id="secretCardsCountLabel">Kartların</span>
-            <span class="toggle-arrow">▲</span>
+            <span class="toggle-arrow" id="secretCardsArrow">▲</span>
           </button>
         </div>
         <div class="slots-five-grid" id="myRosterGrid"></div>
@@ -2600,6 +2861,21 @@
           showToast(`SATILDI: ${msg.entry.name} → ${msg.buyerName} (${msg.price} ₺)`);
         } else if (msg.type === "passed") {
           showToast(`PAS GEÇİLDİ: ${msg.entry.name}`);
+        } else if (msg.type === "dutch_tick") {
+          const p = msg.price;
+          const valEl = document.getElementById("bidHighestVal");
+          const claimPriceEl = document.getElementById("dutchClaimPrice");
+          if (valEl) {
+            valEl.textContent = `${p} ₺`;
+            valEl.classList.remove("price-pulse");
+            void valEl.offsetWidth;
+            valEl.classList.add("price-pulse");
+          }
+          if (claimPriceEl) claimPriceEl.textContent = `${p} ₺`;
+        } else if (msg.type === "reaction") {
+          if (msg.playerId !== myPlayerId) {
+            spawnFloatingReaction(msg.emoji, msg.playerName);
+          }
         } else if (msg.type === "toast") {
           showToast(msg.message);
         }
@@ -2658,18 +2934,21 @@
       const bgEl = document.getElementById("setupBudget");
       const cpEl = document.getElementById("setupCapacity");
       const tmEl = document.getElementById("setupTimer");
+      const atEl = document.getElementById("setupAuctionType");
       const poolEl = document.getElementById("setupPoolTextarea");
 
       if (document.activeElement !== scEl) scEl.value = roomState.scenario;
       if (document.activeElement !== bgEl) bgEl.value = roomState.startingBudget;
       if (document.activeElement !== cpEl) cpEl.value = roomState.rosterCapacity;
       if (document.activeElement !== tmEl) tmEl.value = roomState.bidTimerSeconds;
+      if (atEl && document.activeElement !== atEl && roomState.auctionType) atEl.value = roomState.auctionType;
       if (document.activeElement !== poolEl) poolEl.value = roomState.poolNames.join("\n");
 
       scEl.disabled = !isHost;
       bgEl.disabled = !isHost;
       cpEl.disabled = !isHost;
       tmEl.disabled = !isHost;
+      if (atEl) atEl.disabled = !isHost;
       poolEl.disabled = !isHost;
       document.getElementById("btnStartGameTop").disabled = !isHost;
       document.getElementById("setupPoolCount").textContent = `${roomState.poolCount} İsim Hazır`;
@@ -2795,11 +3074,14 @@
         bottomBudgetVal.textContent = `${me.budget} ₺`;
       }
 
+      const dutchBidBtns = document.getElementById("dutchBidButtons");
+
       if (roomState.auctionState === "idle") {
         spinBtn.style.display = "inline-flex";
         spinBtn.disabled = !isMyTurn;
         spinBtn.textContent = isMyTurn ? "⟳ Şeridi Döndür" : `⏳ Sıra: ${turnName}`;
         liveBidBtns.style.display = "none";
+        if (dutchBidBtns) dutchBidBtns.style.display = "none";
         if (lockedBanner) lockedBanner.style.display = "none";
         if (metricsBox) metricsBox.style.display = "none";
         if (timerWrap) timerWrap.style.display = "none";
@@ -2814,6 +3096,7 @@
         spinBtn.disabled = true;
         spinBtn.textContent = "⟳ Şerit Dönüyor...";
         liveBidBtns.style.display = "none";
+        if (dutchBidBtns) dutchBidBtns.style.display = "none";
         if (lockedBanner) lockedBanner.style.display = "none";
         if (metricsBox) metricsBox.style.display = "none";
         if (timerWrap) timerWrap.style.display = "none";
@@ -2827,24 +3110,55 @@
         if (timerWrap) timerWrap.style.display = "block";
         lotThumb.style.display = "block";
 
+        const isDutch = roomState.roundMode === "dutch";
+        const priceLbl = document.querySelector(".bid-price-lbl");
+        const leaderLbl = document.querySelector(".bid-leader-lbl");
+        const leaderNameEl = document.getElementById("bidLeaderName");
+
         if (isRosterFull) {
           liveBidBtns.style.display = "none";
+          if (dutchBidBtns) dutchBidBtns.style.display = "none";
           if (lockedBanner) lockedBanner.style.display = "block";
+        } else if (isDutch) {
+          liveBidBtns.style.display = "none";
+          if (lockedBanner) lockedBanner.style.display = "none";
+          if (dutchBidBtns) {
+            dutchBidBtns.style.display = "flex";
+            const claimPriceEl = document.getElementById("dutchClaimPrice");
+            const claimBtn = document.getElementById("btnDutchClaim");
+            if (claimPriceEl) claimPriceEl.textContent = `${roomState.highestBid} ₺`;
+            if (claimBtn) {
+              const canAfford = me && me.budget >= roomState.highestBid && !me.isFrozen;
+              claimBtn.disabled = !canAfford;
+            }
+          }
         } else {
           liveBidBtns.style.display = "grid";
+          if (dutchBidBtns) dutchBidBtns.style.display = "none";
           if (lockedBanner) lockedBanner.style.display = "none";
+        }
+
+        if (isDutch) {
+          if (priceLbl) priceLbl.textContent = "Düşen Fiyat:";
+          if (leaderLbl) leaderLbl.textContent = "Durum:";
+          if (leaderNameEl) leaderNameEl.textContent = "İlk Tıklayan Kazanır! ⚡";
+        } else {
+          if (priceLbl) priceLbl.textContent = "Mevcut Teklif:";
+          if (leaderLbl) leaderLbl.textContent = "Lider:";
+          if (leaderNameEl) leaderNameEl.textContent = roomState.highestBidderName || turnName;
         }
 
         const entry = roomState.currentEntry;
         lotTitle.textContent = entry.name;
-        lotSub.textContent = entry.category || roomState.scenario || `Sıra: ${turnName}`;
+        lotSub.textContent = isDutch
+          ? "📉 TERS MÜZAYEDE • Fiyat saniye başı düşüyor, ilk basan kapar!"
+          : (entry.category || roomState.scenario || `Sıra: ${turnName}`);
         const img = entry.image || (roomState.imageCache && roomState.imageCache[entry.name]);
         lotThumb.innerHTML = img
           ? `<img src="${img}" alt="${escapeHtml(entry.name)}" referrerpolicy="no-referrer" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" /><div class="lot-avatar-placeholder" style="display:none">${escapeHtml(entry.name.slice(0, 10))}</div>`
           : `<div class="lot-avatar-placeholder">${escapeHtml(entry.name.slice(0, 10))}</div>`;
 
         document.getElementById("bidHighestVal").textContent = `${roomState.highestBid} ₺`;
-        document.getElementById("bidLeaderName").textContent = roomState.highestBidderName || turnName;
         startLocalCountdown(roomState.bidRemainingSec);
       }
 
@@ -2893,11 +3207,13 @@
         hGrid.innerHTML = "";
         const invCount = me.inventory ? me.inventory.filter(Boolean).length : 0;
         const btnCountEl = document.getElementById("secretCardsCountLabel");
+        const arrowEl = document.getElementById("secretCardsArrow");
         if (btnCountEl) {
           const container = document.getElementById("secretCardsContainer");
           const isOpen = container && container.classList.contains("open");
           const countText = invCount > 0 ? `Kartların (${invCount})` : `Kartların`;
-          btnCountEl.textContent = isOpen ? `Kartları Kapat ▼` : `${countText} ▲`;
+          btnCountEl.textContent = isOpen ? `Kartları Kapat` : countText;
+          if (arrowEl) arrowEl.textContent = isOpen ? `▼` : `▲`;
         }
 
         for (let i = 0; i < 5; i++) {
@@ -3020,13 +3336,17 @@
       if (!container) return;
       container.classList.toggle("open");
       const btnLabel = document.getElementById("secretCardsCountLabel");
+      const arrowEl = document.getElementById("secretCardsArrow");
       const me = roomState?.me;
       const count = me?.inventory ? me.inventory.filter(Boolean).length : 0;
       if (btnLabel) {
         const countText = count > 0 ? `Kartların (${count})` : `Kartların`;
         btnLabel.textContent = container.classList.contains("open") 
-          ? `Kartları Kapat ▼` 
-          : `${countText} ▲`;
+          ? `Kartları Kapat` 
+          : countText;
+      }
+      if (arrowEl) {
+        arrowEl.textContent = container.classList.contains("open") ? "▼" : "▲";
       }
     }
 
@@ -3201,6 +3521,7 @@
         startingBudget: parseInt(document.getElementById("setupBudget").value || "30", 10),
         rosterCapacity: parseInt(document.getElementById("setupCapacity").value || "5", 10),
         bidTimerSeconds: parseInt(document.getElementById("setupTimer").value || "14", 10),
+        auctionType: document.getElementById("setupAuctionType")?.value || "mixed",
         apiKey: document.getElementById("setupApiKey")?.value?.trim() || EMBEDDED_API_KEY,
         poolText: document.getElementById("setupPoolTextarea").value,
       }));
@@ -3257,6 +3578,37 @@
 
     function sendPassBid() {
       ws?.send(JSON.stringify({ action: "pass_bid" }));
+    }
+
+    function sendDutchClaim() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({ action: "dutch_claim" }));
+    }
+
+    function sendReaction(emoji) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({ action: "reaction", emoji }));
+      spawnFloatingReaction(emoji, activePlayerName || "Sen");
+    }
+
+    function spawnFloatingReaction(emoji, senderName) {
+      const container = document.getElementById("floatingReactionsContainer");
+      if (!container) return;
+      const el = document.createElement("div");
+      el.className = "floating-reaction-bubble";
+      const randomX = Math.floor(Math.random() * 70) + 15;
+      el.style.left = randomX + "%";
+      el.innerHTML = `
+        <span class="reaction-emoji">${emoji}</span>
+        <span class="reaction-sender">${escapeHtml(senderName || "")}</span>
+      `;
+      container.appendChild(el);
+      if (navigator.vibrate) {
+        try { navigator.vibrate(25); } catch (e) {}
+      }
+      setTimeout(() => {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 2350);
     }
 
     function sendUndo() {

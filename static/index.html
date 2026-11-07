@@ -42,13 +42,24 @@
     }
 
     body {
-      background-color: var(--bg-app);
+      background-color: #04070D;
+      background: 
+        radial-gradient(circle at 50% 15%, rgba(56, 189, 248, 0.16) 0%, transparent 60%),
+        radial-gradient(circle at 50% 85%, rgba(30, 64, 175, 0.22) 0%, transparent 55%),
+        linear-gradient(180deg, #0B192C 0%, #050C16 100%);
+      background-attachment: fixed;
       color: var(--text-main);
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
+    }
+
+    /* Subtel Felt Grain Texture */
+    .felt-grain-overlay {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 8px 8px;
     }
 
     input, textarea, button {
@@ -71,10 +82,12 @@
        TOP NAVIGATION BAR
     ====================================================================== */
     .navbar {
-      height: 58px;
-      background: var(--bg-surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0 18px;
+      height: 52px;
+      background: rgba(11, 20, 36, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -449,180 +462,179 @@
       gap: 12px;
     }
 
-    /* 1. RAKİPLER ŞERİDİ (Mobilde Yana Kaydırılabilir, Masaüstünde Dengeli Satır) */
-    .opponents-ribbon {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: thin;
-    }
-
-    .opp-pill-card {
-      flex: 1;
-      min-width: 245px;
-      max-width: 340px;
-      scroll-snap-align: start;
-      background: linear-gradient(180deg, rgba(35, 42, 58, 0.75) 0%, var(--bg-surface) 100%);
-      border: 1px solid var(--border);
+    /* ======================================================================
+       1. 8 OYUNCULU CANLI RADAR (4x2 GRID — NO AVATAR INITIALS, PURE NAMES)
+    ====================================================================== */
+    .radar-box {
+      background: rgba(11, 20, 36, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: var(--radius-md);
-      padding: 11px 13px;
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
-      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+      padding: 8px 10px;
+      backdrop-filter: blur(8px);
     }
 
-    .opp-pill-card.turn-holder {
-      border-color: rgba(240, 180, 41, 0.55);
-    }
-
-    .opp-pill-card.active-leader {
-      border-color: var(--emerald);
-      box-shadow: 0 0 0 1px var(--emerald), 0 6px 18px rgba(16, 185, 129, 0.15);
-    }
-
-    .opp-head {
+    .radar-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      margin-bottom: 6px;
+      padding: 0 2px;
     }
 
-    .opp-identity {
+    .radar-title-wrap {
       display: flex;
       align-items: center;
-      gap: 8px;
-      min-width: 0;
-      flex: 1;
+      gap: 6px;
     }
 
-    .opp-avatar-dot {
-      width: 28px;
-      height: 28px;
-      border-radius: 7px;
-      background: var(--bg-input);
-      border: 1px solid var(--border-light);
+    .radar-pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #38BDF8;
+      box-shadow: 0 0 8px #38BDF8;
+      animation: pulse 2s infinite;
+    }
+
+    .radar-title {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #CBD5E1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .radar-hint {
+      font-size: 9.5px;
+      color: #64748B;
+      font-weight: 600;
+    }
+
+    .radar-my-rank {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #38BDF8;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .players-radar-grid, .opponents-ribbon {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .radar-card {
+      height: 52px;
+      border-radius: 10px;
+      background: rgba(11, 20, 36, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 5px 8px;
       display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: transform 0.08s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      user-select: none;
+      backdrop-filter: blur(6px);
+    }
+
+    .radar-card:active {
+      transform: scale(0.96);
+    }
+
+    .radar-card.is-me {
+      border-color: #38BDF8;
+      background: rgba(14, 165, 233, 0.15);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.18);
+    }
+
+    .radar-card.is-leader {
+      border-color: #F59E0B;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.32);
+    }
+
+    .radar-card.is-turn {
+      border-color: rgba(245, 158, 11, 0.85);
+    }
+
+    .radar-card.is-bankrupt {
+      opacity: 0.65;
+      border-color: rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    .radar-card-top {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
+      gap: 4px;
+    }
+
+    .radar-card-name {
       font-size: 11px;
       font-weight: 800;
-      color: var(--gold);
-      flex-shrink: 0;
-    }
-
-    .opp-name-col {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      gap: 2px;
-    }
-
-    .opp-name-wrap {
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 5px;
+      color: #F1F5F9;
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
-    .opp-meta-line {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .opp-money-pill {
+    .radar-card-money {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
+      font-size: 11.5px;
       font-weight: 800;
-      color: #34D399;
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 4px 9px;
-      border-radius: 6px;
+      color: #F59E0B;
       white-space: nowrap;
-      flex-shrink: 0;
     }
 
-    .opp-roster-grid {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 5px;
-    }
-
-    .opp-mini-slot {
-      height: 46px;
-      border-radius: 6px;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
+    .radar-card-bottom {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-      padding: 2px;
+      gap: 4px;
     }
 
-    .opp-mini-slot.filled {
-      border-color: var(--border-light);
-      background: #141924;
-      justify-content: flex-end;
-      padding: 0;
-    }
-
-    .opp-mini-slot.filled img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center 15%;
-      opacity: 0.88;
-    }
-
-    .opp-mini-slot-name {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      background: linear-gradient(to top, rgba(10, 13, 20, 0.95) 0%, rgba(10, 13, 20, 0.65) 75%, transparent 100%);
-      color: #F8FAFC;
+    .radar-sub-tag {
       font-size: 8.5px;
-      font-weight: 700;
-      text-align: center;
-      padding: 6px 2px 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-weight: 800;
+      color: #64748B;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
     }
 
-    .opp-mini-slot.empty-dot::after {
-      content: '';
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--border-light);
-      opacity: 0.6;
+    .radar-sub-tag.radar-tag-me {
+      color: #38BDF8;
+      font-weight: 900;
     }
 
-    .opp-mini-slot.lost-slot {
-      background: rgba(239, 68, 68, 0.08);
-      border-color: rgba(239, 68, 68, 0.25);
-      color: #F87171;
+    .radar-card-status {
       font-size: 9px;
       font-weight: 800;
+    }
+
+    .radar-meta-normal {
+      color: #94A3B8;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .radar-meta-frozen {
+      color: #22D3EE;
+    }
+
+    .radar-meta-silenced {
+      color: #C084FC;
+    }
+
+    .radar-meta-shield {
+      color: #60A5FA;
+    }
+
+    .radar-meta-curse {
+      color: #F87171;
+    }
+
+    .radar-meta-bankrupt {
+      color: #EF4444;
     }
 
     .badge-status {
@@ -638,16 +650,19 @@
     .st-freeze { background: rgba(6, 182, 212, 0.2); color: #22D3EE; }
     .st-curse  { background: rgba(239, 68, 68, 0.2); color: #F87171; }
 
-    /* 2. MERKEZ SAHNE: SENARYO + CS ŞERİDİ + CANLI TEKLİF KÜRSÜSÜ */
+    /* ======================================================================
+       2. MERKEZ SAHNE: SENARYO + CS ŞERİDİ + CANLI TEKLİF KÜRSÜSÜ
+    ====================================================================== */
     .stage-box {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
+      background: rgba(11, 20, 36, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.09);
       border-radius: var(--radius-lg);
-      padding: 14px 16px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       box-shadow: var(--shadow-card);
+      backdrop-filter: blur(10px);
     }
 
     .scenario-bar {
@@ -655,51 +670,99 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
+      background: rgba(6, 11, 20, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: var(--radius-sm);
-      padding: 8px 12px;
-      font-size: 13px;
+      padding: 7px 11px;
+      font-size: 12.5px;
     }
 
     .scenario-bar strong {
       color: var(--gold);
-      font-size: 11px;
+      font-size: 10.5px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-right: 6px;
     }
 
-    /* CS HORIZONTAL REEL */
+    /* REEL SECTION & TOP CONTROL BAR */
+    .reel-section {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .reel-control-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2px;
+    }
+
+    .reel-tag {
+      font-size: 10px;
+      font-weight: 800;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .pulse-dot-amber {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #F59E0B;
+      box-shadow: 0 0 6px #F59E0B;
+      animation: pulse 1.8s infinite;
+    }
+
+    .btn-spin-reel-top {
+      background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%);
+      border: none;
+      border-bottom: 3px solid #92400E;
+      border-radius: 9px;
+      padding: 6px 14px;
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #0F172A;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+      transition: all 0.08s ease;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-spin-reel-top:active {
+      transform: translateY(2px);
+      border-bottom-width: 1px;
+      box-shadow: 0 1px 4px rgba(245, 158, 11, 0.2);
+    }
+
+    .btn-spin-reel-top:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(0.4);
+    }
+
+    /* CS HORIZONTAL REEL (HEIGHT: 96PX, SEAMLESS MASK) */
     .reel-viewport {
       position: relative;
       width: 100%;
-      height: 186px;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
+      height: 96px;
+      background: rgba(6, 11, 20, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
       overflow: hidden;
-    }
-
-    .reel-viewport::before,
-    .reel-viewport::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 90px;
-      z-index: 5;
-      pointer-events: none;
-    }
-
-    .reel-viewport::before {
-      left: 0;
-      background: linear-gradient(to right, var(--bg-input) 0%, transparent 100%);
-    }
-
-    .reel-viewport::after {
-      right: 0;
-      background: linear-gradient(to left, var(--bg-input) 0%, transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
     }
 
     .reel-pointer {
@@ -707,32 +770,36 @@
       left: 50%;
       top: 0;
       bottom: 0;
-      width: 3px;
-      background: var(--gold);
+      width: 2px;
+      background: #F59E0B;
       transform: translateX(-50%);
-      z-index: 10;
+      z-index: 20;
+      box-shadow: 0 0 12px #F59E0B;
+      pointer-events: none;
     }
 
     .reel-pointer::before {
-      content: '';
+      content: '▼';
       position: absolute;
-      top: 0;
+      top: -2px;
       left: 50%;
       transform: translateX(-50%);
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-top: 10px solid var(--gold);
+      color: #F59E0B;
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1;
     }
 
     .reel-pointer::after {
-      content: '';
+      content: '▲';
       position: absolute;
-      bottom: 0;
+      bottom: -2px;
       left: 50%;
       transform: translateX(-50%);
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-bottom: 10px solid var(--gold);
+      color: #F59E0B;
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1;
     }
 
     .reel-track {
@@ -747,47 +814,31 @@
     }
 
     .reel-card {
-      width: 144px;
-      height: 164px;
+      width: 80px;
+      height: 82px;
       margin: 0 4px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border-light);
-      border-bottom: 3px solid #3B82F6;
-      border-radius: var(--radius-sm);
-      padding: 6px;
+      background: #0B1322;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      flex-shrink: 0;
-      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
 
-    .reel-card.tier-mor { border-bottom-color: #8B5CF6; }
-    .reel-card.tier-pembe { border-bottom-color: #EC4899; }
-    .reel-card.tier-kirmizi { border-bottom-color: #EF4444; }
-    .reel-card.tier-altin { border-bottom-color: var(--gold); }
+    .reel-card.tier-mor { border-color: #8B5CF6; }
+    .reel-card.tier-pembe { border-color: #EC4899; }
+    .reel-card.tier-kirmizi { border-color: #EF4444; }
+    .reel-card.tier-altin { border-color: var(--gold); }
 
     .reel-img-box {
       width: 100%;
-      height: 112px;
-      border-radius: 5px;
-      overflow: hidden;
+      height: 100%;
       position: relative;
-      background: #0D1017;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .reel-img-blur {
-      position: absolute;
-      top: -15%;
-      left: -15%;
-      width: 130%;
-      height: 130%;
-      object-fit: cover;
-      filter: blur(12px) brightness(0.5);
-      opacity: 0.6;
+      background: #070B12;
+      overflow: hidden;
     }
 
     .reel-img-main {
@@ -795,67 +846,72 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center center;
+      object-position: center 15%;
       z-index: 1;
     }
 
-    .reel-img-box.contain-mode .reel-img-main {
-      object-fit: contain;
-      object-position: center center;
+    .reel-card-name-banner {
+      position: absolute;
+      inset-x: 0;
+      bottom: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.96) 0%, rgba(0,0,0,0.65) 75%, transparent 100%);
+      padding: 16px 2px 2px;
+      font-size: 9.5px;
+      font-weight: 800;
+      color: #FFFFFF;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+      z-index: 2;
     }
 
-    .reel-monogram {
+    .reel-card-placeholder {
       width: 100%;
       height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 10px;
       font-weight: 800;
-      color: var(--gold);
-      background: #141923;
-    }
-
-    .reel-item-name {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-main);
+      color: #94A3B8;
+      background: #0F172A;
       text-align: center;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1.2;
-      overflow: hidden;
+      padding: 4px;
     }
 
-    /* BIDDING PODIUM */
+    /* BIDDING PODIUM (CLEAN PHOTO SHOWCASE, NO MONOGRAMS) */
     .bidding-podium {
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 12px 14px;
+      background: rgba(11, 20, 36, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 10px 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      gap: 10px;
     }
 
     .lot-showcase {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
     }
 
     .lot-avatar {
       width: 50px;
       height: 50px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      border: 2px solid rgba(56, 189, 248, 0.5);
       overflow: hidden;
-      background: var(--bg-elevated);
+      background: #070C15;
       flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
 
     .lot-avatar img {
@@ -865,140 +921,399 @@
       object-position: center 15%;
     }
 
-    .lot-name {
-      font-size: 17px;
+    .lot-avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9.5px;
       font-weight: 800;
-      color: var(--text-main);
+      color: #38BDF8;
+      text-align: center;
+      background: #0C1A2E;
+      padding: 2px;
+    }
+
+    .lot-meta {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .lot-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #FFFFFF;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: -0.2px;
     }
 
     .lot-status {
-      font-size: 12px;
-      color: var(--text-muted);
+      font-size: 11px;
+      color: #94A3B8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+
+    .bid-timer-wrap {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .bid-timer-lbl {
+      font-size: 8.5px;
+      font-weight: 800;
+      color: #38BDF8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+    }
+
+    .bid-timer-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 19px;
+      font-weight: 900;
+      color: #34D399;
+      line-height: 1.1;
+    }
+
+    /* PRICE & LEADER BAR */
+    .bid-price-bar {
+      background: rgba(6, 11, 20, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 7px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .bid-price-col {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .bid-price-lbl {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94A3B8;
+    }
+
+    .bid-price-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 17px;
+      font-weight: 800;
+      color: #F59E0B;
+    }
+
+    .bid-leader-col {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .bid-leader-lbl {
+      font-size: 11px;
+      color: #94A3B8;
+    }
+
+    .bid-leader-name {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #38BDF8;
+    }
+
+    /* BIDDING CONTROLS & 3D ARCADE BUTTONS */
+    .bidding-controls-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .wallet-badge-row {
+      background: rgba(6, 11, 20, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 6px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .wallet-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #CBD5E1;
+    }
+
+    .wallet-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #34D399;
+      box-shadow: 0 0 6px #34D399;
+    }
+
+    .wallet-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      font-weight: 800;
+      color: #34D399;
+    }
+
+    .live-bid-buttons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn-bid-plus1 {
+      height: 58px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #FCD34D 0%, #F59E0B 70%, #D97706 100%);
+      border: none;
+      border-bottom: 5px solid #92400E;
+      color: #1A1002;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+      box-shadow: 0 8px 18px -4px rgba(245, 158, 11, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.06s ease;
+      user-select: none;
+    }
+
+    .btn-bid-plus1:active {
+      transform: translateY(4px);
+      border-bottom-width: 1px;
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-bid-plus3 {
+      height: 58px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #38BDF8 0%, #0EA5E9 70%, #0284C7 100%);
+      border: none;
+      border-bottom: 5px solid #0369A1;
+      color: #031525;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+      box-shadow: 0 8px 18px -4px rgba(14, 165, 233, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.06s ease;
+      user-select: none;
+    }
+
+    .btn-bid-plus3:active {
+      transform: translateY(4px);
+      border-bottom-width: 1px;
+      box-shadow: 0 2px 6px rgba(14, 165, 233, 0.3);
+    }
+
+    .bid-btn-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 21px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .bid-btn-sub {
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      opacity: 0.85;
       margin-top: 2px;
     }
 
-    .bid-live-metrics {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .metric-block {
+    .bidding-locked-banner {
+      background: linear-gradient(135deg, rgba(120, 53, 15, 0.45) 0%, rgba(15, 23, 42, 0.85) 100%);
+      border: 2px solid rgba(245, 158, 11, 0.45);
+      border-radius: 14px;
+      padding: 10px 14px;
       text-align: center;
     }
 
-    .metric-lbl {
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    .metric-val {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 19px;
+    .bidding-locked-head {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 12px;
       font-weight: 800;
-      color: var(--gold);
+      color: #F59E0B;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
     }
 
-    .bid-actions-wrap {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 6px;
+    .bidding-locked-text {
+      font-size: 11px;
+      color: #CBD5E1;
+      line-height: 1.35;
+      margin: 0;
     }
 
-    #liveBidButtons {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .bid-input-num {
-      width: 68px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius-sm);
-      padding: 8px;
-      color: var(--text-main);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      font-weight: 700;
-      text-align: center;
-    }
-
-    /* 3. ALT OYUNCU KONSOLU (Kendi Kartın & Gizli Elin) */
-    .player-console {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .console-panel {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 14px 16px;
+    /* ======================================================================
+       3. ALT OYUNCU KONSOLU (Kendi Kadron & Gizli Kartların)
+    ====================================================================== */
+    .player-bottom-console {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      box-shadow: var(--shadow-card);
+      gap: 8px;
     }
 
-    .console-top {
+    .my-roster-box {
+      background: rgba(11, 20, 36, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 8px 10px;
+      backdrop-filter: blur(8px);
+    }
+
+    .my-roster-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
+      align-items: center;
+      margin-bottom: 6px;
     }
 
-    .console-title {
-      font-size: 13px;
+    .my-roster-title {
+      font-size: 11.5px;
       font-weight: 800;
-      color: var(--text-main);
+      color: #F1F5F9;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
-    .slots-row {
+    .roster-counter-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #38BDF8;
+      font-weight: 800;
+    }
+
+    .btn-toggle-secret-cards {
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #C084FC;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.1s ease;
+    }
+
+    .btn-toggle-secret-cards:active {
+      transform: scale(0.96);
+    }
+
+    .slots-five-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 8px;
+      gap: 6px;
     }
 
     .slot-box {
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      height: 116px;
-      padding: 6px;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      background: #0B1322;
+      border: 1px solid rgba(56, 189, 248, 0.35);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    .slot-box.filled img.slot-img-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 15%;
+    }
+
+    .slot-info-overlay {
+      position: absolute;
+      inset-x: 0;
+      bottom: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.96) 0%, rgba(0,0,0,0.65) 75%, transparent 100%);
+      padding: 12px 2px 2px;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .slot-name-tag {
+      font-size: 8.5px;
+      font-weight: 800;
+      color: #FFFFFF;
+      line-height: 1.1;
+      white-space: nowrap;
       overflow: hidden;
-      position: relative;
+      text-overflow: ellipsis;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+    }
+
+    .slot-price-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 7.5px;
+      font-weight: 800;
+      color: #38BDF8;
+      line-height: 1;
+      margin-top: 1px;
     }
 
     .slot-box.empty {
-      border-style: dashed;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      background: rgba(6, 11, 20, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
-      color: var(--text-dim);
-      font-size: 11px;
-      font-weight: 600;
+      color: #64748B;
+      gap: 2px;
+    }
+
+    .slot-empty-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.5px;
+      color: #64748B;
+    }
+
+    .slot-empty-text {
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #64748B;
     }
 
     .slot-box.debuff-locked {
       background: var(--crimson-soft);
       border-color: rgba(239, 68, 68, 0.35);
-      justify-content: center;
       color: #FCA5A5;
-      font-size: 11px;
+      font-size: 9px;
       font-weight: 700;
     }
 
@@ -1010,21 +1325,6 @@
     .slot-box.interactive:hover {
       border-color: var(--gold);
       transform: translateY(-2px);
-    }
-
-    .slot-thumb {
-      width: 100%;
-      height: 70px;
-      border-radius: 4px;
-      overflow: hidden;
-      background: #0B0E14;
-    }
-
-    .slot-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center 15%;
     }
 
     .card-slot-thumb {
@@ -1059,6 +1359,143 @@
       font-size: 10px;
       font-weight: 700;
       color: var(--gold);
+    }
+
+    /* SECRET HAND DRAWER / COLLAPSIBLE */
+    .secret-hand-drawer {
+      display: none;
+      background: rgba(11, 20, 36, 0.75);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 4px;
+      backdrop-filter: blur(8px);
+    }
+
+    .secret-hand-drawer.open {
+      display: block;
+    }
+
+    .secret-drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .secret-title-col {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .secret-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #C084FC;
+    }
+
+    .secret-subtitle {
+      font-size: 9.5px;
+      color: #94A3B8;
+    }
+
+    .secret-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    /* ROSTER MODAL STYLES */
+    .roster-modal-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .roster-modal-slot {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      background: #0B1322;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .roster-modal-slot.filled img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 15%;
+    }
+    .roster-modal-slot-info {
+      position: absolute;
+      inset-x: 0;
+      bottom: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.96) 0%, rgba(0,0,0,0.65) 75%, transparent 100%);
+      padding: 10px 2px 2px;
+      text-align: center;
+      z-index: 2;
+    }
+    .roster-modal-slot-info .pur-name {
+      font-size: 8px;
+      font-weight: 800;
+      color: #FFFFFF;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .roster-modal-slot-info .pur-price {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 7.5px;
+      font-weight: 800;
+      color: #38BDF8;
+      display: block;
+    }
+    .roster-modal-slot.empty {
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      background: rgba(6, 11, 20, 0.4);
+      color: #64748B;
+    }
+    .roster-modal-slot.empty .slot-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.5px;
+    }
+    .roster-modal-slot.empty .slot-empty-lbl {
+      font-size: 7.5px;
+      font-weight: 800;
+    }
+    .roster-modal-slot.lost {
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      background: rgba(239, 68, 68, 0.08);
+      color: #F87171;
+    }
+    .roster-block-card {
+      background: rgba(11, 20, 36, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+    .roster-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #F1F5F9;
+    }
+    .roster-block-header .budget-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #F59E0B;
     }
 
     /* ======================================================================
@@ -1341,46 +1778,13 @@
       .setup-grid {
         grid-template-columns: 1fr;
       }
-      .player-console {
-        grid-template-columns: 1fr;
-      }
-      .bidding-podium {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 11px 12px;
-        gap: 10px;
-      }
-      .bid-live-metrics {
-        justify-content: space-around;
-        background: var(--bg-surface);
-        padding: 8px 6px;
-        border-radius: var(--radius-sm);
-        border: 1px solid var(--border);
-        gap: 10px;
-      }
-      .bid-actions-wrap {
-        width: 100%;
-        justify-content: stretch;
-      }
-      #btnSpinReel {
-        width: 100%;
-      }
-      #liveBidButtons {
-        width: 100%;
-        display: grid;
+      .players-radar-grid {
         grid-template-columns: repeat(4, 1fr);
-        gap: 6px;
-      }
-      #liveBidButtons .bid-input-num {
-        grid-column: span 2;
-        width: 100%;
-      }
-      #liveBidButtons .btn-emerald {
-        grid-column: span 2;
+        gap: 5px;
       }
       .navbar {
         padding: 0 10px;
-        height: 52px;
+        height: 50px;
       }
       .brand-logo span.hide-mobile {
         display: none;
@@ -1391,89 +1795,115 @@
       }
       .nav-right .btn {
         padding: 6px 10px;
-        font-size: 12px;
+        font-size: 11.5px;
       }
     }
 
     @media (max-width: 600px) {
       #gameView {
-        padding: 8px 8px 16px;
-        gap: 8px;
+        padding: 6px 6px 14px;
+        gap: 6px;
       }
       #setupView {
-        padding: 12px 10px 24px;
-        gap: 12px;
+        padding: 10px 8px 20px;
+        gap: 10px;
       }
       .card-panel {
-        padding: 14px 12px;
+        padding: 12px 10px;
       }
       .invite-banner {
-        padding: 12px;
-      }
-      .opp-pill-card {
-        min-width: 220px;
-        max-width: 265px;
-        padding: 9px 10px;
-        gap: 7px;
-      }
-      .opp-mini-slot {
-        height: 40px;
-      }
-      .stage-box {
         padding: 10px;
-        gap: 9px;
       }
-      .scenario-bar {
-        padding: 7px 10px;
-        font-size: 12px;
+      .radar-box {
+        padding: 6px 8px;
       }
-      .reel-viewport {
-        height: 148px;
+      .players-radar-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
       }
-      .reel-viewport::before,
-      .reel-viewport::after {
-        width: 44px;
+      .radar-card {
+        height: 48px;
+        padding: 4px 6px;
       }
-      .reel-card {
-        width: 112px;
-        height: 132px;
-        padding: 5px;
-      }
-      .reel-img-box {
-        height: 86px;
-      }
-      .reel-item-name {
-        font-size: 11px;
-        height: 26px;
-      }
-      .lot-name {
-        font-size: 15px;
-      }
-      .lot-status {
-        font-size: 11px;
-      }
-      .metric-val {
-        font-size: 16px;
-      }
-      .console-panel {
-        padding: 10px 10px;
-        gap: 8px;
-      }
-      .slots-row {
-        gap: 5px;
-      }
-      .slot-box {
-        height: 98px;
-        padding: 4px;
-      }
-      .slot-thumb {
-        height: 54px;
-      }
-      .slot-label {
+      .radar-card-name {
         font-size: 10px;
       }
-      .slot-sub {
-        font-size: 9px;
+      .radar-card-money {
+        font-size: 10.5px;
+      }
+      .radar-sub-tag {
+        font-size: 7.5px;
+      }
+      .radar-card-status {
+        font-size: 8px;
+      }
+      .stage-box {
+        padding: 8px 10px;
+        gap: 7px;
+      }
+      .scenario-bar {
+        padding: 5px 8px;
+        font-size: 11.5px;
+      }
+      .reel-viewport {
+        height: 96px;
+      }
+      .reel-card {
+        width: 80px;
+        height: 80px;
+        margin: 0 3px;
+      }
+      .bidding-podium {
+        padding: 8px 10px;
+        gap: 8px;
+      }
+      .lot-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+      }
+      .lot-name {
+        font-size: 13.5px;
+      }
+      .lot-status {
+        font-size: 10px;
+      }
+      .bid-timer-val {
+        font-size: 18px;
+      }
+      .bid-price-bar {
+        padding: 6px 10px;
+      }
+      .bid-price-num {
+        font-size: 15.5px;
+      }
+      .live-bid-buttons-grid {
+        gap: 8px;
+      }
+      .btn-bid-plus1, .btn-bid-plus3 {
+        height: 54px;
+        border-radius: 12px;
+      }
+      .bid-btn-val {
+        font-size: 19px;
+      }
+      .bid-btn-sub {
+        font-size: 8.5px;
+      }
+      .my-roster-box {
+        padding: 6px 8px;
+      }
+      .slots-five-grid {
+        gap: 4px;
+      }
+      .slot-box {
+        border-radius: 8px;
+      }
+      .slot-name-tag {
+        font-size: 7.5px;
+      }
+      .slot-price-tag {
+        font-size: 7px;
       }
       .modal-backdrop {
         padding: 8px;
@@ -1482,10 +1912,10 @@
         max-height: 92dvh;
       }
       .modal-header {
-        padding: 12px 14px;
+        padding: 10px 12px;
       }
       .modal-body {
-        padding: 12px;
+        padding: 10px;
       }
       .shop-grid {
         grid-template-columns: 1fr;
@@ -1502,11 +1932,12 @@
         <span class="brand-dot"></span>
         <span class="hide-mobile">AÇIK ARTTIRMA</span>
       </div>
+      <span class="chip gold" id="topRoomPill" style="display:none;font-family:'JetBrains Mono',monospace;font-weight:800;cursor:pointer" onclick="copyInviteLink()" title="Masa kodunu kopyala">Masa: -</span>
       <span class="chip emerald" id="topRemainingPill">25 isim</span>
-      <span class="chip gold" id="topRoomPill" style="display:none" onclick="copyInviteLink()" title="Davet linkini kopyala">Oda: -</span>
     </div>
 
     <div class="nav-right">
+      <button class="btn" id="btnAllRostersTop" style="display:none" onclick="openAllRostersModal()">👥 Kadrolar</button>
       <button class="btn" id="btnOpenShopTop" style="display:none" onclick="openShopModal()">Mağaza</button>
       <button class="btn" id="btnUndoTop" style="display:none" onclick="sendUndo()">↺ Geri Al</button>
       <button class="btn" id="btnLobbyTop" style="display:none" onclick="sendReturnLobby()">Lobi</button>
@@ -1636,11 +2067,21 @@
   </section>
 
   <!-- ====================================================================
-       VIEW 2: GAME SCREEN (Herkes Kendi Ekranında)
+       VIEW 2: GAME SCREEN (Herkes Kendi Ekranında — Kompakt Sıfır Kaydırma)
   ==================================================================== -->
   <section id="gameView">
-    <!-- 1. MASADAKİ DİĞER OYUNCULAR ŞERİDİ -->
-    <div class="opponents-ribbon" id="opponentsBar"></div>
+    <!-- 1. 8 OYUNCULU CANLI RADAR (4x2 GRID — NO AVATAR INITIALS, PURE NAMES) -->
+    <div class="radar-box">
+      <div class="radar-header">
+        <div class="radar-title-wrap">
+          <span class="radar-pulse-dot"></span>
+          <span class="radar-title">8 Kişilik Canlı Radar</span>
+          <span class="radar-hint">(Tıkla → Detay)</span>
+        </div>
+        <span class="radar-my-rank" id="radarMyRankText">Sen: #1 Sıra</span>
+      </div>
+      <div class="players-radar-grid" id="opponentsBar"></div>
+    </div>
 
     <!-- 2. MERKEZ MÜZAYEDE SAHNESİ -->
     <div class="stage-box">
@@ -1654,87 +2095,137 @@
         </span>
       </div>
 
-      <!-- CS KAYAR ŞERİT -->
-      <div class="reel-viewport" id="reelViewport">
-        <div class="reel-pointer"></div>
-        <div class="reel-track" id="reelTrack"></div>
+      <!-- CS KAYAR ŞERİT BÖLÜMÜ -->
+      <div class="reel-section">
+        <!-- ŞERİT ÜST KONTROL BARI (ÇEVİR BUTONU BURADA, KARTLARIN ÜSTÜNE BİNMİYOR) -->
+        <div class="reel-control-bar">
+          <div class="reel-tag">
+            <span class="pulse-dot-amber"></span>
+            <span>CANLI ŞERİT</span>
+          </div>
+          <button class="btn-spin-reel-top" id="btnSpinReel" onclick="sendSpin()">
+            ⟳ Şeridi Döndür
+          </button>
+        </div>
+
+        <!-- REEL VIEWPORT (KESİNTİSİZ KART ALANI, HEIGHT: 96PX) -->
+        <div class="reel-viewport" id="reelViewport">
+          <div class="reel-pointer"></div>
+          <div class="reel-track" id="reelTrack"></div>
+        </div>
       </div>
 
-      <!-- CANLI İHALE KÜRSÜSÜ -->
+      <!-- CANLI İHALE KÜRSÜSÜ (TEMİZ VE GÖRSELLİ) -->
       <div class="bidding-podium">
         <div class="lot-showcase">
           <div class="lot-avatar" id="bidLotThumb" style="display:none"></div>
-          <div>
+          <div class="lot-meta">
             <div class="lot-name" id="bidLotTitle">Yeni İhale İçin Hazır</div>
             <div class="lot-status" id="bidLotSub">Sıradaki karakteri seçmek için şeridi döndürün</div>
           </div>
         </div>
 
-        <div class="bid-live-metrics" id="bidMetricsBox" style="display:none">
-          <div class="metric-block">
-            <div class="metric-lbl">En Yüksek Teklif</div>
-            <div class="metric-val" id="bidHighestVal">0 ₺</div>
+        <div class="bid-timer-wrap" id="bidTimerWrap" style="display:none">
+          <span class="bid-timer-lbl">KALAN SÜRE</span>
+          <div class="bid-timer-val" id="bidTimerVal">14.0s</div>
+        </div>
+      </div>
+
+      <!-- MEVCUT TEKLİF & LİDER FİYAT BARI -->
+      <div class="bid-price-bar" id="bidMetricsBox" style="display:none">
+        <div class="bid-price-col">
+          <span class="bid-price-lbl">Mevcut Teklif:</span>
+          <span class="bid-price-num" id="bidHighestVal">0 ₺</span>
+        </div>
+        <div class="bid-leader-col">
+          <span class="bid-leader-lbl">Lider:</span>
+          <span class="bid-leader-name" id="bidLeaderName">-</span>
+        </div>
+      </div>
+
+      <!-- BAŞPARMAK TEKLİF ALANI & KASA BÜTÇESİ & 5/5 KİLİDİ -->
+      <div class="bidding-controls-panel">
+        <div class="wallet-badge-row">
+          <div class="wallet-label">
+            <span class="wallet-dot"></span>
+            <span>Kasandaki Bütçen:</span>
           </div>
-          <div class="metric-block">
-            <div class="metric-lbl">Lider Oyuncu</div>
-            <div class="metric-val" id="bidLeaderName" style="font-size:15px;color:var(--text-main)">-</div>
-          </div>
-          <div class="metric-block">
-            <div class="metric-lbl">Süre</div>
-            <div class="metric-val" id="bidTimerVal" style="color:var(--emerald)">14.0s</div>
-          </div>
+          <span class="wallet-val" id="myBottomBudgetVal">30 ₺</span>
         </div>
 
-        <div class="bid-actions-wrap">
-          <button class="btn btn-gold" id="btnSpinReel" style="padding:11px 22px;font-size:14px" onclick="sendSpin()">
-            ⟳ ŞERİDİ DÖNDÜR
+        <!-- 3D TEKLİF BUTONLARI (+1 ₺ VE +3 ₺) -->
+        <div id="liveBidButtons" class="live-bid-buttons-grid" style="display:none">
+          <button class="btn-bid-plus1" onclick="placeQuickBid(1)">
+            <span class="bid-btn-val">+1 ₺</span>
+            <span class="bid-btn-sub">Teklif Artır</span>
           </button>
+          <button class="btn-bid-plus3" onclick="placeQuickBid(3)">
+            <span class="bid-btn-val">+3 ₺</span>
+            <span class="bid-btn-sub">Baskı Kur 🔥</span>
+          </button>
+        </div>
 
-          <div id="liveBidButtons" style="display:none">
-            <button class="btn btn-gold" onclick="placeQuickBid(1)">+1 ₺</button>
-            <button class="btn btn-gold" onclick="placeQuickBid(2)">+2 ₺</button>
-            <button class="btn btn-gold" onclick="placeQuickBid(5)">+5 ₺</button>
-            <button class="btn btn-crimson" onclick="sendPassBid()">Pas</button>
-            <input type="number" id="customBidAmount" class="bid-input-num" placeholder="Özel ₺" min="1" />
-            <button class="btn btn-emerald" onclick="placeCustomBid()">Teklif Ver</button>
+        <!-- 5/5 KURAL KİLİDİ BANNERI -->
+        <div id="biddingLockedBanner" class="bidding-locked-banner" style="display:none">
+          <div class="bidding-locked-head">
+            <span>🔒</span>
+            <span>Kadron Tamamlandı (5/5)</span>
           </div>
+          <p class="bidding-locked-text">
+            Bütçen kalsa dahi takım kapasiten dolduğu için açık arttırmaya katılamazsın. Şu an <strong style="color:var(--gold)">İzleyici</strong> modundasın.
+          </p>
         </div>
       </div>
     </div>
 
-    <!-- 3. ALT OYUNCU KONSOLU (Sadece Senin Kadron, Bütçen ve Gizli Kartların) -->
-    <div class="player-console">
-      <!-- SOL PANEL: KENDİ KADROM VE BÜTÇEM -->
-      <div class="console-panel">
-        <div class="console-top">
-          <div class="console-title">
+    <!-- 3. KENDİ KADRON VE GİZLİ KARTLARIN -->
+    <div class="player-bottom-console">
+      <!-- KADROM (5 SLOT) -->
+      <div class="my-roster-box">
+        <div class="my-roster-header">
+          <div class="my-roster-title">
             <span id="myConsoleName">KADROM</span>
+            <span id="myRosterCounter" class="roster-counter-badge">(0 / 5)</span>
             <span id="myStatusBadges" style="display:inline-flex;gap:4px"></span>
           </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="chip emerald" id="myBudgetVal">30 ₺</span>
-            <span class="chip" id="myRosterCounter">0 / 5</span>
-          </div>
+          <button type="button" class="btn-toggle-secret-cards" onclick="toggleSecretCardsSheet()">
+            <span id="secretCardsCountLabel">Gizli Kartlar</span>
+            <span class="toggle-arrow">▲</span>
+          </button>
         </div>
-        <div class="slots-row" id="myRosterGrid"></div>
+        <div class="slots-five-grid" id="myRosterGrid"></div>
       </div>
 
-      <!-- SAĞ PANEL: GİZLİ AKSİYON KARTLARIM VE MAĞAZA -->
-      <div class="console-panel">
-        <div class="console-top">
-          <div class="console-title">
-            <span>GİZLİ KARTLARIM</span>
-            <span style="font-size:11px;font-weight:600;color:var(--text-muted)">(Sadece sen görürsün)</span>
+      <!-- GİZLİ AKSİYON KARTLARIM (COLLAPSIBLE / DRAWER) -->
+      <div class="secret-hand-drawer" id="secretCardsContainer">
+        <div class="secret-drawer-header">
+          <div class="secret-title-col">
+            <span class="secret-title">GİZLİ AKSİYON KARTLARIN</span>
+            <span class="secret-subtitle">Sadece sen görürsün • Taktik kartını oynamak için dokun</span>
           </div>
-          <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;align-items:center;gap:6px">
             <span class="chip gold" id="myPointsVal">0 P</span>
-            <button class="btn btn-gold" style="padding:5px 11px;font-size:12px" onclick="openShopModal()">+ Kart Mağazası</button>
+            <button class="btn btn-gold" style="padding:4px 8px;font-size:11px" onclick="openShopModal()">+ Mağaza</button>
           </div>
         </div>
-        <div class="slots-row" id="mySecretHandGrid"></div>
+        <div class="secret-cards-grid" id="mySecretHandGrid"></div>
       </div>
     </div>
   </section>
+
+  <!-- MODAL: OYUNCU KADRO DETAYLARI -->
+  <div class="modal-backdrop" id="playerRosterModal" onclick="if(event.target===this) closePlayerRosterModal()">
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="rosterModalTitle">Oyuncu Kadrosu</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px" id="rosterModalSub">Kalan Bütçe: 18 ₺</div>
+        </div>
+        <button class="btn" onclick="closePlayerRosterModal()">✕</button>
+      </div>
+      <div class="modal-body" id="rosterModalBody"></div>
+    </div>
+  </div>
 
   <!-- ====================================================================
        MODAL 1: KART MAĞAZASI
@@ -1991,13 +2482,16 @@
       document.getElementById("entryGateView").style.display = "none";
       const topRoomPill = document.getElementById("topRoomPill");
       topRoomPill.style.display = "inline-flex";
-      topRoomPill.textContent = `Oda: ${roomState.roomCode}`;
+      topRoomPill.textContent = `Masa: #${roomState.roomCode}`;
       document.getElementById("topRemainingPill").textContent = `${roomState.availableCount} isim`;
 
       const isHost = roomState.hostId === myPlayerId;
-      document.getElementById("btnOpenShopTop").style.display = roomState.phase !== "setup" ? "inline-flex" : "none";
-      document.getElementById("btnUndoTop").style.display = (isHost && roomState.phase !== "setup") ? "inline-flex" : "none";
-      document.getElementById("btnLobbyTop").style.display = (isHost && roomState.phase !== "setup") ? "inline-flex" : "none";
+      const isGameOrAfter = roomState.phase !== "setup";
+      const btnAllRosters = document.getElementById("btnAllRostersTop");
+      if (btnAllRosters) btnAllRosters.style.display = isGameOrAfter ? "inline-flex" : "none";
+      document.getElementById("btnOpenShopTop").style.display = isGameOrAfter ? "inline-flex" : "none";
+      document.getElementById("btnUndoTop").style.display = (isHost && isGameOrAfter) ? "inline-flex" : "none";
+      document.getElementById("btnLobbyTop").style.display = (isHost && isGameOrAfter) ? "inline-flex" : "none";
 
       if (roomState.phase === "setup") {
         document.getElementById("setupView").style.display = "flex";
@@ -2066,74 +2560,63 @@
       document.getElementById("liveScenarioText").textContent = roomState.scenario;
       document.getElementById("liveRoundNum").textContent = roomState.currentRound;
 
-      // 1. Opponents Ribbon (Sadece İsim, Kadro ve Kalan Para — Gizli kart bilgisi kesinlikle gösterilmez)
+      // 1. 8 OYUNCULU CANLI RADAR (4x2 Grid — İsim Monogramları Yok, Tam İsimler)
       const oppBar = document.getElementById("opponentsBar");
       oppBar.innerHTML = "";
-      const opponents = roomState.players.filter(p => p.id !== myPlayerId);
-      if (opponents.length === 0) {
-        oppBar.style.display = "none";
-      } else {
-        oppBar.style.display = "flex";
-        opponents.forEach(p => {
-          const card = document.createElement("div");
-          const isLeader = roomState.highestBidderId === p.id && roomState.auctionState === "bidding";
-          const isTurn = roomState.turnPlayerId === p.id;
-          card.className = "opp-pill-card"
-            + (isLeader ? " active-leader" : "")
-            + (isTurn ? " turn-holder" : "");
-
-          const badges = [];
-          if (isTurn) badges.push('<span class="badge-status st-turn">SIRA ONDA</span>');
-          if (p.hasShield) badges.push('<span class="badge-status st-shield">KALKAN</span>');
-          if (p.isFrozen) badges.push('<span class="badge-status st-freeze">DONDU</span>');
-          if (p.hasBlackCurse) badges.push('<span class="badge-status st-curse">LANET</span>');
-          if (p.silencedRounds > 0) badges.push(`<span class="badge-status" style="background:rgba(168,85,247,0.25);color:#C084FC;border:1px solid rgba(168,85,247,0.4)">MÜHÜRLÜ (${p.silencedRounds})</span>`);
-
-          const totalOppSlots = p.baseCapacity || roomState.rosterCapacity || 5;
-          let miniSlotsHtml = "";
-          for (let i = 0; i < totalOppSlots; i++) {
-            if (i >= p.capacity) {
-              miniSlotsHtml += `<div class="opp-mini-slot lost-slot" title="Kayıp Slot">✕</div>`;
-            } else if (i < p.purchases.length) {
-              const pur = p.purchases[i];
-              const purImg = pur.image || (roomState.imageCache && roomState.imageCache[pur.name]);
-              const thumbHtml = purImg
-                ? `<img src="${purImg}" alt="" referrerpolicy="no-referrer" />`
-                : `<div class="reel-monogram" style="font-size:11px">${getInitials(pur.name)}</div>`;
-              miniSlotsHtml += `
-                <div class="opp-mini-slot filled" title="${escapeHtml(pur.name)} (${pur.price} ₺)">
-                  ${thumbHtml}
-                  <div class="opp-mini-slot-name">${escapeHtml(pur.name)}</div>
-                </div>
-              `;
-            } else {
-              miniSlotsHtml += `<div class="opp-mini-slot empty-dot" title="Boş Kadro Slotu"></div>`;
-            }
-          }
-
-          card.innerHTML = `
-            <div class="opp-head">
-              <div class="opp-identity">
-                <div class="opp-avatar-dot">${getInitials(p.name)}</div>
-                <div class="opp-name-col">
-                  <div class="opp-name-wrap">
-                    <span>${escapeHtml(p.name)}</span>
-                    ${badges.join("")}
-                  </div>
-                  <div class="opp-meta-line">
-                    <span>Kadro: ${p.purchases.length}/${p.capacity}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="opp-money-pill">${p.budget} ₺</div>
-            </div>
-            <div class="opp-roster-grid" style="grid-template-columns: repeat(${totalOppSlots}, minmax(0, 1fr))">
-              ${miniSlotsHtml}
-            </div>
-          `;
-          oppBar.appendChild(card);
-        });
+      const allPlayers = roomState.players || [];
+      const myRankIndex = allPlayers.findIndex(p => p.id === myPlayerId);
+      const myRankEl = document.getElementById("radarMyRankText");
+      if (myRankEl) {
+        myRankEl.textContent = myRankIndex >= 0 ? `Sen: #${myRankIndex + 1} Sıra` : "";
       }
+
+      allPlayers.forEach(p => {
+        const isMe = p.id === myPlayerId;
+        const isLeader = roomState.highestBidderId === p.id && roomState.auctionState === "bidding";
+        const isTurn = roomState.turnPlayerId === p.id;
+        const isBankrupt = p.budget <= 0 && p.purchases.length < p.capacity;
+
+        const card = document.createElement("div");
+        card.className = "radar-card"
+          + (isMe ? " is-me" : "")
+          + (isLeader ? " is-leader" : "")
+          + (isTurn ? " is-turn" : "")
+          + (isBankrupt ? " is-bankrupt" : "");
+
+        card.onclick = () => openPlayerRosterModal(p.id);
+
+        let statusText = `${p.purchases.length}/${p.capacity}`;
+        let statusClass = "radar-meta-normal";
+
+        if (p.isFrozen) {
+          statusText = "DONDU";
+          statusClass = "radar-meta-frozen";
+        } else if (p.silencedRounds > 0) {
+          statusText = `MÜHÜR (${p.silencedRounds})`;
+          statusClass = "radar-meta-silenced";
+        } else if (p.hasShield) {
+          statusText = "KALKAN";
+          statusClass = "radar-meta-shield";
+        } else if (p.hasBlackCurse) {
+          statusText = "LANET";
+          statusClass = "radar-meta-curse";
+        } else if (isBankrupt) {
+          statusText = "İFLAS";
+          statusClass = "radar-meta-bankrupt";
+        }
+
+        card.innerHTML = `
+          <div class="radar-card-top">
+            <span class="radar-card-name" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</span>
+            <span class="radar-card-money">${p.budget}₺</span>
+          </div>
+          <div class="radar-card-bottom">
+            <span class="radar-sub-tag ${isMe ? 'radar-tag-me' : ''}">${isMe ? 'SEN' : 'KADRO'}</span>
+            <span class="radar-card-status ${statusClass}">${statusText}</span>
+          </div>
+        `;
+        oppBar.appendChild(card);
+      });
 
       if (!isReelAnimating && roomState.auctionState === "idle") {
         populateStaticReelPreview();
@@ -2141,63 +2624,82 @@
         hydrateReelImagesInPlace();
       }
 
-      // 2. Bidding Podium
+      // 2. Bidding Podium & Controls
       const spinBtn = document.getElementById("btnSpinReel");
       const liveBidBtns = document.getElementById("liveBidButtons");
+      const lockedBanner = document.getElementById("biddingLockedBanner");
       const metricsBox = document.getElementById("bidMetricsBox");
+      const timerWrap = document.getElementById("bidTimerWrap");
       const lotTitle = document.getElementById("bidLotTitle");
       const lotSub = document.getElementById("bidLotSub");
       const lotThumb = document.getElementById("bidLotThumb");
       const isMyTurn = !roomState.turnPlayerId || roomState.turnPlayerId === myPlayerId;
       const turnName = roomState.turnPlayerName || "Oyuncu";
 
+      const me = roomState.me;
+      const isRosterFull = me && me.purchases && me.purchases.length >= me.capacity;
+      const bottomBudgetVal = document.getElementById("myBottomBudgetVal");
+      if (bottomBudgetVal && me) {
+        bottomBudgetVal.textContent = `${me.budget} ₺`;
+      }
+
       if (roomState.auctionState === "idle") {
         spinBtn.style.display = "inline-flex";
         spinBtn.disabled = !isMyTurn;
-        spinBtn.textContent = isMyTurn ? "⟳ Şeridi Döndür (Sıra Sende)" : `⏳ Sıra: ${turnName}`;
+        spinBtn.textContent = isMyTurn ? "⟳ Şeridi Döndür" : `⏳ Sıra: ${turnName}`;
         liveBidBtns.style.display = "none";
-        metricsBox.style.display = "none";
+        if (lockedBanner) lockedBanner.style.display = "none";
+        if (metricsBox) metricsBox.style.display = "none";
+        if (timerWrap) timerWrap.style.display = "none";
         lotThumb.style.display = "none";
         lotThumb.innerHTML = "";
         lotTitle.textContent = isMyTurn ? "Sıra Sende! Şeridi Döndür" : `Sıra ${turnName} Oyuncusunda`;
         lotSub.textContent = isMyTurn
           ? "Kimse artırmazsa çıkan isim 1 ₺ taban fiyatla sende kalır"
-          : `${turnName} şeridi döndürecek (Kimse artırmazsa 1 ₺ ile onda kalır)`;
+          : `${turnName} şeridi döndürecek (Kimse artırmazsa onda kalır)`;
       } else if (roomState.auctionState === "spinning") {
         spinBtn.style.display = "inline-flex";
         spinBtn.disabled = true;
         spinBtn.textContent = "⟳ Şerit Dönüyor...";
         liveBidBtns.style.display = "none";
-        metricsBox.style.display = "none";
+        if (lockedBanner) lockedBanner.style.display = "none";
+        if (metricsBox) metricsBox.style.display = "none";
+        if (timerWrap) timerWrap.style.display = "none";
         lotThumb.style.display = "none";
         lotThumb.innerHTML = "";
         lotTitle.textContent = "Şerit Dönüyor...";
-        lotSub.textContent = `Sıra: ${turnName} — Sıradaki karakter belirleniyor`;
+        lotSub.textContent = `Sıradaki karakter belirleniyor...`;
       } else if (roomState.auctionState === "bidding" && roomState.currentEntry) {
         spinBtn.style.display = "none";
-        liveBidBtns.style.display = "";
-        metricsBox.style.display = "flex";
+        if (metricsBox) metricsBox.style.display = "flex";
+        if (timerWrap) timerWrap.style.display = "block";
         lotThumb.style.display = "block";
+
+        if (isRosterFull) {
+          liveBidBtns.style.display = "none";
+          if (lockedBanner) lockedBanner.style.display = "block";
+        } else {
+          liveBidBtns.style.display = "grid";
+          if (lockedBanner) lockedBanner.style.display = "none";
+        }
 
         const entry = roomState.currentEntry;
         lotTitle.textContent = entry.name;
-        lotSub.textContent = `Sıra: ${turnName} (Kimse artırmazsa 1 ₺ ile sıra sahibinde kalır)`;
+        lotSub.textContent = entry.category || roomState.scenario || `Sıra: ${turnName}`;
         const img = entry.image || (roomState.imageCache && roomState.imageCache[entry.name]);
         lotThumb.innerHTML = img
-          ? `<img src="${img}" alt="" referrerpolicy="no-referrer" />`
-          : `<div class="reel-monogram" style="font-size:15px">${getInitials(entry.name)}</div>`;
+          ? `<img src="${img}" alt="${escapeHtml(entry.name)}" referrerpolicy="no-referrer" />`
+          : `<div class="lot-avatar-placeholder">${escapeHtml(entry.name.slice(0, 10))}</div>`;
 
         document.getElementById("bidHighestVal").textContent = `${roomState.highestBid} ₺`;
         document.getElementById("bidLeaderName").textContent = roomState.highestBidderName || turnName;
         startLocalCountdown(roomState.bidRemainingSec);
       }
 
-      // 3. My Personal Console (Only renders configured baseCapacity slots!)
-      const me = roomState.me;
+      // 3. Kendi Kadron (Kare Slotlar, Emojiler Yok)
       if (me) {
         document.getElementById("myConsoleName").textContent = `${me.name} — Kadrom`;
-        document.getElementById("myRosterCounter").textContent = `${me.purchases.length} / ${me.capacity}`;
-        document.getElementById("myBudgetVal").textContent = `${me.budget} ₺`;
+        document.getElementById("myRosterCounter").textContent = `(${me.purchases.length} / ${me.capacity})`;
         document.getElementById("myPointsVal").textContent = `${me.sessionPoints} P`;
 
         const myBadges = [];
@@ -2215,28 +2717,36 @@
           const slot = document.createElement("div");
           if (i >= me.capacity) {
             slot.className = "slot-box debuff-locked";
-            slot.textContent = "Kayıp Slot";
+            slot.innerHTML = `<span class="slot-empty-num">✕</span><span class="slot-empty-text">Kayıp Slot</span>`;
           } else if (i < me.purchases.length) {
             const pur = me.purchases[i];
             const img = pur.image || (roomState.imageCache && roomState.imageCache[pur.name]);
-            slot.className = "slot-box";
+            slot.className = "slot-box filled";
             slot.innerHTML = `
-              <div class="slot-thumb">
-                ${img ? `<img src="${img}" alt="" referrerpolicy="no-referrer" />` : `<div class="reel-monogram" style="font-size:16px">${getInitials(pur.name)}</div>`}
+              ${img ? `<img class="slot-img-bg" src="${img}" alt="${escapeHtml(pur.name)}" referrerpolicy="no-referrer" />` : ''}
+              <div class="slot-info-overlay">
+                <div class="slot-name-tag" title="${escapeHtml(pur.name)}">${escapeHtml(pur.name)}</div>
+                <div class="slot-price-tag">${pur.price} ₺</div>
               </div>
-              <div class="slot-label" title="${escapeHtml(pur.name)}">${escapeHtml(pur.name)}</div>
-              <div class="slot-sub">${pur.price} ₺</div>
             `;
           } else {
             slot.className = "slot-box empty";
-            slot.textContent = `Slot ${i + 1}`;
+            slot.innerHTML = `<span class="slot-empty-num">#${i + 1}</span><span class="slot-empty-text">BOŞ</span>`;
           }
           rGrid.appendChild(slot);
         }
 
-        // Secret Hand 5 Slots
+        // Gizli Kartlar (Collapsible Drawer)
         const hGrid = document.getElementById("mySecretHandGrid");
         hGrid.innerHTML = "";
+        const invCount = me.inventory ? me.inventory.length : 0;
+        const btnCountEl = document.getElementById("secretCardsCountLabel");
+        if (btnCountEl) {
+          const container = document.getElementById("secretCardsContainer");
+          const isOpen = container && container.classList.contains("open");
+          btnCountEl.textContent = isOpen ? `Gizli Kartları Gizle ▼` : `${invCount} Gizli Kartın Var ▲`;
+        }
+
         for (let i = 0; i < 5; i++) {
           const card = me.inventory[i];
           const slot = document.createElement("div");
@@ -2256,7 +2766,7 @@
             `;
           } else {
             slot.className = "slot-box empty";
-            slot.textContent = "Boş Kart";
+            slot.innerHTML = `<span class="slot-empty-num">#${i + 1}</span><span class="slot-empty-text">BOŞ</span>`;
           }
           hGrid.appendChild(slot);
         }
@@ -2268,22 +2778,117 @@
     }
 
     // =========================================================================
+    // OYUNCU KADRO DETAYLARI MODAL VE KONTROLLERİ
+    // =========================================================================
+    function openPlayerRosterModal(playerId) {
+      if (!roomState || !roomState.players) return;
+      const targetPlayer = (playerId === "all" || !playerId) ? null : roomState.players.find(p => p.id === playerId);
+      const modal = document.getElementById("playerRosterModal");
+      const titleEl = document.getElementById("rosterModalTitle");
+      const subEl = document.getElementById("rosterModalSub");
+      const bodyEl = document.getElementById("rosterModalBody");
+      if (!modal || !bodyEl) return;
+
+      if (!targetPlayer) {
+        titleEl.textContent = "Tüm Oyuncuların Kadroları";
+        subEl.textContent = `Toplam ${roomState.players.length} Oyuncu`;
+        let html = '<div class="all-rosters-list">';
+        roomState.players.forEach(p => {
+          html += renderPlayerRosterBlock(p);
+        });
+        html += '</div>';
+        bodyEl.innerHTML = html;
+      } else {
+        const isMe = targetPlayer.id === myPlayerId;
+        titleEl.textContent = `${targetPlayer.name} ${isMe ? '(Sen)' : ''} — Kadro Detayı`;
+        subEl.textContent = `Kalan Bütçe: ${targetPlayer.budget} ₺ • Kadro: ${targetPlayer.purchases.length}/${targetPlayer.capacity}`;
+        bodyEl.innerHTML = renderPlayerRosterBlock(targetPlayer);
+      }
+
+      modal.classList.add("open");
+    }
+
+    function renderPlayerRosterBlock(p) {
+      const totalSlots = p.baseCapacity || roomState.rosterCapacity || 5;
+      let slotsHtml = '<div class="roster-modal-grid">';
+      for (let i = 0; i < totalSlots; i++) {
+        if (i >= p.capacity) {
+          slotsHtml += `
+            <div class="roster-modal-slot lost">
+              <span style="font-weight:900;font-size:12px">✕</span>
+              <span style="font-size:7.5px;font-weight:700">Kayıp Slot</span>
+            </div>
+          `;
+        } else if (i < p.purchases.length) {
+          const pur = p.purchases[i];
+          const img = pur.image || (roomState.imageCache && roomState.imageCache[pur.name]);
+          slotsHtml += `
+            <div class="roster-modal-slot filled">
+              ${img ? `<img src="${img}" alt="${escapeHtml(pur.name)}" referrerpolicy="no-referrer" />` : ''}
+              <div class="roster-modal-slot-info">
+                <span class="pur-name">${escapeHtml(pur.name)}</span>
+                <span class="pur-price">${pur.price} ₺</span>
+              </div>
+            </div>
+          `;
+        } else {
+          slotsHtml += `
+            <div class="roster-modal-slot empty">
+              <span class="slot-num">#${i + 1}</span>
+              <span class="slot-empty-lbl">BOŞ</span>
+            </div>
+          `;
+        }
+      }
+      slotsHtml += '</div>';
+
+      return `
+        <div class="roster-block-card">
+          <div class="roster-block-header">
+            <strong>${escapeHtml(p.name)}</strong>
+            <span class="budget-tag">${p.budget} ₺</span>
+          </div>
+          ${slotsHtml}
+        </div>
+      `;
+    }
+
+    function closePlayerRosterModal() {
+      const modal = document.getElementById("playerRosterModal");
+      if (modal) modal.classList.remove("open");
+    }
+
+    function openAllRostersModal() {
+      openPlayerRosterModal("all");
+    }
+
+    function toggleSecretCardsSheet() {
+      const container = document.getElementById("secretCardsContainer");
+      if (!container) return;
+      container.classList.toggle("open");
+      const btnLabel = document.getElementById("secretCardsCountLabel");
+      const me = roomState?.me;
+      const count = me?.inventory?.length || 0;
+      if (btnLabel) {
+        btnLabel.textContent = container.classList.contains("open") 
+          ? `Gizli Kartları Gizle ▼` 
+          : `${count} Gizli Kartın Var ▲`;
+      }
+    }
+
+    // =========================================================================
     // CS HORIZONTAL REEL
     // =========================================================================
     function buildReelCardHtml(item) {
       const img = item.image || (roomState?.imageCache && roomState.imageCache[item.name]);
-      const isContain = /godzilla|king kong|dinozor|araba|uçak|bina|robot/i.test(item.name);
-      const boxClass = isContain ? "reel-img-box contain-mode" : "reel-img-box";
-
       const visual = img
-        ? `<img class="reel-img-blur" src="${img}" alt="" referrerpolicy="no-referrer" />
-           <img class="reel-img-main" src="${img}" alt="${escapeHtml(item.name)}" referrerpolicy="no-referrer" />`
-        : `<div class="reel-monogram">${getInitials(item.name)}</div>`;
+        ? `<img class="reel-img-main" src="${img}" alt="${escapeHtml(item.name)}" referrerpolicy="no-referrer" />`
+        : `<div class="reel-card-placeholder">${escapeHtml(item.name.slice(0, 8))}</div>`;
 
       return `
         <div class="reel-card tier-${item.tier || 'mavi'}">
-          <div class="${boxClass}" data-item-name="${escapeHtml(item.name)}">${visual}</div>
-          <div class="reel-item-name">${escapeHtml(item.name)}</div>
+          <div class="reel-img-box" data-item-name="${escapeHtml(item.name)}">${visual}</div>
+          <div class="reel-card-name-banner">${escapeHtml(item.name)}</div>
         </div>
       `;
     }
@@ -2291,12 +2896,11 @@
     function hydrateReelImagesInPlace() {
       if (!roomState || !roomState.imageCache) return;
       document.querySelectorAll(".reel-img-box[data-item-name]").forEach(box => {
-        if (!box.querySelector(".reel-monogram")) return;
+        if (box.querySelector("img.reel-img-main")) return;
         const name = box.getAttribute("data-item-name");
         const img = roomState.imageCache[name];
         if (img) {
-          box.innerHTML = `<img class="reel-img-blur" src="${img}" alt="" referrerpolicy="no-referrer" />
-            <img class="reel-img-main" src="${img}" alt="${escapeHtml(name)}" referrerpolicy="no-referrer" />`;
+          box.innerHTML = `<img class="reel-img-main" src="${img}" alt="${escapeHtml(name)}" referrerpolicy="no-referrer" />`;
         }
       });
     }
@@ -2322,7 +2926,7 @@
       track.style.transform = "translateX(0px)";
 
       const firstCardEl = track.querySelector(".reel-card");
-      const cardRectWidth = firstCardEl ? firstCardEl.getBoundingClientRect().width : 144;
+      const cardRectWidth = firstCardEl ? firstCardEl.getBoundingClientRect().width : 80;
       const fullCardWidth = cardRectWidth + 8; // kart genişliği + 4px sol + 4px sağ margin
       const maxOffset = Math.floor(cardRectWidth * 0.34);
       const safeOffset = Math.max(-maxOffset, Math.min(maxOffset, msg.offsetPx || 0));

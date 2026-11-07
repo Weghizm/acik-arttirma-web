@@ -1934,6 +1934,7 @@
       </div>
       <span class="chip gold" id="topRoomPill" style="display:none;font-family:'JetBrains Mono',monospace;font-weight:800;cursor:pointer" onclick="copyInviteLink()" title="Masa kodunu kopyala">Masa: -</span>
       <span class="chip emerald" id="topRemainingPill">25 isim</span>
+      <span class="chip" id="reconnectPill" style="display:none;background:rgba(239,68,68,0.25);color:#FCA5A5;border:1px solid rgba(239,68,68,0.45);font-weight:700;font-size:11px">🔄 Yeniden bağlanılıyor...</span>
     </div>
 
     <div class="nav-right">
@@ -2329,9 +2330,14 @@
     const _DEF_KEY_B64 = "QVEuQWI4Uk42SjFpa2tDRVpWWXZTc2x6M2hmMVlvVU1VVmtJZ2IwZ2l1UmQ1alNRb3dNbmc=";
     const EMBEDDED_API_KEY = window.atob ? atob(_DEF_KEY_B64) : "";
     let ws = null;
-    // sessionStorage her tarayıcı sekmesine ayrı kimlik verir (aynı tarayıcıda 2 sekme açıp karşılıklı test edebilmek için)
-    let myPlayerId = sessionStorage.getItem("aa_player_id") || ("p_" + Math.random().toString(36).substring(2, 10));
+
+    // Use localStorage for rock-solid permanent device identity across WhatsApp tab switches & refreshes
+    let myPlayerId = localStorage.getItem("aa_player_id") || sessionStorage.getItem("aa_player_id") || ("p_" + Math.random().toString(36).substring(2, 10));
+    localStorage.setItem("aa_player_id", myPlayerId);
     sessionStorage.setItem("aa_player_id", myPlayerId);
+
+    let activePlayerName = localStorage.getItem("aa_player_name") || sessionStorage.getItem("aa_player_name") || "";
+    let activeRoomCode = localStorage.getItem("aa_active_room") || "";
 
     let roomState = null;
     let isReelAnimating = false;
@@ -2339,14 +2345,66 @@
     let pendingCardSlot = null;
     let localTimerInterval = null;
     let setupSyncTimer = null;
+    let reconnectTimeout = null;
+    let reconnectAttempts = 0;
+    let intentionalDisconnect = false;
 
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("oda")) {
-      document.getElementById("gateRoomCode").value = urlParams.get("oda").toUpperCase();
+    const urlRoom = urlParams.get("oda") ? urlParams.get("oda").toUpperCase().trim() : "";
+    if (urlRoom) {
+      document.getElementById("gateRoomCode").value = urlRoom;
+      activeRoomCode = urlRoom;
+      localStorage.setItem("aa_active_room", urlRoom);
     }
-    if (sessionStorage.getItem("aa_player_name")) {
-      document.getElementById("gatePlayerName").value = sessionStorage.getItem("aa_player_name");
+    if (activePlayerName) {
+      document.getElementById("gatePlayerName").value = activePlayerName;
     }
+
+    function setReconnectIndicator(show) {
+      const pill = document.getElementById("reconnectPill");
+      if (pill) pill.style.display = show ? "inline-flex" : "none";
+    }
+
+    function scheduleAutoReconnect() {
+      if (!activeRoomCode || intentionalDisconnect) return;
+      clearTimeout(reconnectTimeout);
+      setReconnectIndicator(true);
+      reconnectAttempts++;
+      const delay = Math.min(1000 * Math.pow(1.4, reconnectAttempts), 4000);
+      reconnectTimeout = setTimeout(() => {
+        if (activeRoomCode && (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING)) {
+          connectToRoom(activeRoomCode, activePlayerName || "Oyuncu");
+        }
+      }, delay);
+    }
+
+    // Mobile app lifecycle triggers: WhatsApp switch, tab visibility change, lock screen wake
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && activeRoomCode && !intentionalDisconnect) {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+          clearTimeout(reconnectTimeout);
+          connectToRoom(activeRoomCode, activePlayerName || "Oyuncu");
+        }
+      }
+    });
+
+    window.addEventListener("pageshow", () => {
+      if (activeRoomCode && !intentionalDisconnect) {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+          clearTimeout(reconnectTimeout);
+          connectToRoom(activeRoomCode, activePlayerName || "Oyuncu");
+        }
+      }
+    });
+
+    window.addEventListener("online", () => {
+      if (activeRoomCode && !intentionalDisconnect) {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+          clearTimeout(reconnectTimeout);
+          connectToRoom(activeRoomCode, activePlayerName || "Oyuncu");
+        }
+      }
+    });
 
     function playMechanicalTick() {
       try {
@@ -2384,6 +2442,8 @@
 
     async function createNewSecretRoom() {
       const name = document.getElementById("gatePlayerName").value.trim() || "Oyuncu";
+      activePlayerName = name;
+      localStorage.setItem("aa_player_name", name);
       sessionStorage.setItem("aa_player_name", name);
       try {
         const res = await fetch("/api/create-room", {
@@ -2396,6 +2456,11 @@
           showToast(data.error || "Masa kurulamadı.");
           return;
         }
+        if (data.hostToken) {
+          localStorage.setItem("aa_host_token_" + data.roomCode, data.hostToken);
+        }
+        activeRoomCode = data.roomCode;
+        localStorage.setItem("aa_active_room", data.roomCode);
         connectToRoom(data.roomCode, name);
       } catch (e) {
         showToast("Masa oluşturulurken hata oluştu.");
@@ -2409,6 +2474,8 @@
         showToast("Lütfen katılmak istediğiniz 6 haneli masa kodunu yazın.");
         return;
       }
+      activePlayerName = name;
+      localStorage.setItem("aa_player_name", name);
       sessionStorage.setItem("aa_player_name", name);
       try {
         const res = await fetch(`/api/check-room?code=${encodeURIComponent(code)}`);
@@ -2417,6 +2484,8 @@
           showToast(data.error || "Bu koda ait aktif bir masa bulunamadı!");
           return;
         }
+        activeRoomCode = data.roomCode;
+        localStorage.setItem("aa_active_room", data.roomCode);
         connectToRoom(data.roomCode, name);
       } catch (e) {
         showToast("Masa kontrol edilirken hata oluştu.");
@@ -2424,23 +2493,56 @@
     }
 
     function connectToRoom(code, name) {
+      if (!code) return;
+      intentionalDisconnect = false;
+      activeRoomCode = code;
+      activePlayerName = name || activePlayerName || "Oyuncu";
+      localStorage.setItem("aa_active_room", code);
+      localStorage.setItem("aa_player_name", activePlayerName);
+
+      const hostToken = localStorage.getItem("aa_host_token_" + code) || "";
       const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
       const wsUrl = `${proto}//${window.location.host}/ws/${encodeURIComponent(code)}/${encodeURIComponent(myPlayerId)}`;
 
-      if (ws) ws.close();
-      ws = new WebSocket(wsUrl);
+      if (ws) {
+        ws.onclose = null;
+        ws.onerror = null;
+        try { ws.close(); } catch(e) {}
+      }
+
+      setReconnectIndicator(true);
+
+      try {
+        ws = new WebSocket(wsUrl);
+      } catch (e) {
+        scheduleAutoReconnect();
+        return;
+      }
 
       ws.onopen = () => {
+        setReconnectIndicator(false);
+        reconnectAttempts = 0;
         window.history.replaceState({}, "", `/?oda=${encodeURIComponent(code)}`);
-        ws.send(JSON.stringify({ action: "join", name }));
+        ws.send(JSON.stringify({ action: "join", name: activePlayerName, hostToken }));
       };
 
       ws.onmessage = (ev) => {
-        const msg = JSON.parse(ev.data);
+        let msg;
+        try {
+          msg = JSON.parse(ev.data);
+        } catch (e) { return; }
+
         if (msg.type === "room_not_found") {
+          setReconnectIndicator(false);
+          intentionalDisconnect = true;
+          activeRoomCode = null;
+          localStorage.removeItem("aa_active_room");
           showToast(msg.message);
           return;
-        } else if (msg.type === "kicked" || (msg.type === "state" && !msg.me)) {
+        } else if (msg.type === "kicked") {
+          intentionalDisconnect = true;
+          activeRoomCode = null;
+          localStorage.removeItem("aa_active_room");
           if (ws) {
             ws.onclose = null;
             ws.close();
@@ -2458,6 +2560,13 @@
           showToast(msg.message || "Masa kurucusu tarafından odadan çıkarıldınız.");
           return;
         } else if (msg.type === "state") {
+          setReconnectIndicator(false);
+          if (!msg.me) {
+            const hToken = localStorage.getItem("aa_host_token_" + code) || "";
+            if (ws && ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({ action: "join", name: activePlayerName, hostToken: hToken }));
+            }
+          }
           roomState = msg;
           renderApp();
         } else if (msg.type === "spin_start") {
@@ -2474,7 +2583,15 @@
       };
 
       ws.onclose = () => {
-        showToast("Bağlantı koptu, lütfen sayfayı yenileyin.");
+        if (!intentionalDisconnect && activeRoomCode) {
+          scheduleAutoReconnect();
+        }
+      };
+
+      ws.onerror = () => {
+        if (!intentionalDisconnect && activeRoomCode) {
+          scheduleAutoReconnect();
+        }
       };
     }
 
@@ -2490,7 +2607,7 @@
       topRoomPill.textContent = `Masa: #${roomState.roomCode}`;
       document.getElementById("topRemainingPill").textContent = `${roomState.availableCount} isim`;
 
-      const isHost = roomState.hostId === myPlayerId;
+      const isHost = Boolean(roomState.isHost || (roomState.hostId === myPlayerId));
       const isGameOrAfter = roomState.phase !== "setup";
       const btnAllRosters = document.getElementById("btnAllRostersTop");
       if (btnAllRosters) btnAllRosters.style.display = isGameOrAfter ? "inline-flex" : "none";
@@ -3323,6 +3440,11 @@
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
+    }
+
+    // Auto-reconnect on page load if active room was open
+    if (activeRoomCode && activePlayerName) {
+      connectToRoom(activeRoomCode, activePlayerName);
     }
   </script>
 </body>

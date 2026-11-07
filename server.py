@@ -344,39 +344,78 @@ def save_image_cache_to_disk() -> None:
         pass
 
 
-# Common single-word entities that require specific disambiguation anchors
-DISAMBIGUATION_ANCHORS = {
-    "maximus": "Maximus Gladiator",
-    "kratos": "Kratos God of War",
-    "ezel": "Ezel Kenan İmirzalıoğlu",
-    "arthur morgan": "Arthur Morgan RDR2",
-    "tyler durden": "Tyler Durden Fight Club",
-    "joker": "Joker DC",
-    "blade": "Blade Marvel",
-    "flash": "The Flash DC",
-    "thor": "Thor Marvel",
-    "vito corleone": "Vito Corleone Godfather",
-    "tony montana": "Tony Montana Scarface",
-    "hannibal lecter": "Hannibal Lecter",
-    "lara croft": "Lara Croft Tomb Raider",
-    "james bond": "James Bond 007",
-    "walter white": "Walter White Breaking Bad",
-    "darth vader": "Darth Vader Star Wars",
-    "john wick": "John Wick Keanu Reeves",
-    "geralt of rivia": "Geralt of Rivia Witcher",
-    "polat alemdar": "Polat Alemdar Kurtlar Vadisi",
-    "süleyman çakır": "Süleyman Çakır Kurtlar Vadisi",
-    "memati baş": "Memati Baş Kurtlar Vadisi",
-    "ramiz dayı": "Ramiz Karaeski Ezel",
-    "recep ivedik": "Recep İvedik",
-}
-
-# Negative keywords: reject results containing coins, anatomy, contractors, maps, or clipart logos
+# Negative keywords: reject results containing coins, anatomy, contractors, maps, logos, cartoons, or clipart
 BAD_IMAGE_KEYWORDS = {
     "coin", "madeni para", "harita", "map", "logo", "vector", "vektör", "clipart",
     "contractor", "gluteus", "muscle", "anatomi", "anatomy", "flag", "bayrak",
-    "dizi indir", "transparent png", "png icon", "clip art", "free icon", "download png", "madalyon"
+    "dizi indir", "transparent png", "png icon", "clip art", "free icon", "download png", "madalyon",
+    "classroom", "sınıf", "aardvark", "school", "ogrenci", "öğrenci", "karikatür"
 }
+
+# Rich disambiguation anchors mapping pop culture & history entities to unambiguous portrait queries
+DISAMBIGUATION_ANCHORS = {
+    "arthur morgan": "Arthur Morgan Red Dead Redemption 2 cowboy portrait",
+    "maximus": "Russell Crowe Maximus Decimus Meridius Gladiator movie portrait",
+    "tyler durden": "Brad Pitt Tyler Durden Fight Club movie portrait",
+    "joker": "Heath Ledger Joker The Dark Knight movie portrait",
+    "kratos": "Kratos God of War PlayStation video game portrait",
+    "lara croft": "Lara Croft Tomb Raider character portrait video game",
+    "tony montana": "Al Pacino Tony Montana Scarface movie portrait",
+    "john wick": "Keanu Reeves John Wick suit movie portrait",
+    "hannibal lecter": "Anthony Hopkins Hannibal Lecter The Silence of the Lambs portrait",
+    "walter white": "Bryan Cranston Walter White Breaking Bad portrait",
+    "vito corleone": "Marlon Brando Vito Corleone The Godfather portrait",
+    "sherlock holmes": "Sherlock Holmes classic portrait",
+    "james bond": "Daniel Craig James Bond 007 portrait",
+    "geralt of rivia": "Geralt of Rivia The Witcher 3 character portrait",
+    "darth vader": "Darth Vader Star Wars iconic portrait",
+    "batman": "Batman The Dark Knight iconic portrait",
+    "wolverine": "Hugh Jackman Wolverine Logan movie portrait",
+    "gandalf": "Ian McKellen Gandalf The Lord of the Rings portrait",
+    "aragorn": "Viggo Mortensen Aragorn The Lord of the Rings portrait",
+    "neo": "Keanu Reeves Neo The Matrix movie portrait",
+    "terminator": "Arnold Schwarzenegger Terminator movie portrait",
+    "jack sparrow": "Johnny Depp Captain Jack Sparrow Pirates of the Caribbean",
+    "indiana jones": "Harrison Ford Indiana Jones movie portrait",
+    "rocky balboa": "Sylvester Stallone Rocky Balboa movie portrait",
+    "rambo": "Sylvester Stallone John Rambo movie portrait",
+    "polat alemdar": "Necati Sasmaz Polat Alemdar Kurtlar Vadisi portrait",
+    "süleyman çakır": "Oktay Kaynarca Suleyman Cakir Kurtlar Vadisi portrait",
+    "memati baş": "Gurkan Uygun Memati Bas Kurtlar Vadisi portrait",
+    "ramiz dayı": "Tuncel Kurtiz Ramiz Dayi Karaeski Ezel portrait",
+    "ezel": "Kenan Imirzalioglu Ezel Bayraktar portrait",
+    "recep ivedik": "Sahan Gokbakar Recep Ivedik portrait",
+    "cristiano ronaldo": "Cristiano Ronaldo iconic portrait photo",
+    "thomas shelby": "Cillian Murphy Thomas Shelby Peaky Blinders portrait",
+    "goku": "Son Goku Dragon Ball Z official portrait",
+}
+
+
+def disambiguate_names_sync(names: List[str]) -> Dict[str, str]:
+    """Dynamically use Gemini to generate precise disambiguated image queries for any custom names."""
+    needed = [n.strip() for n in names if n.strip() and n.strip().lower() not in DISAMBIGUATION_ANCHORS]
+    if not needed:
+        return {}
+    sys_prompt = (
+        "You are an expert pop culture and visual entity disambiguation engine. "
+        "For each given entity/character/item, generate a 4-6 word precise visual search query to find the authentic iconic portrait or photo of that exact entity. "
+        "Include actor names for movie characters (e.g. Brad Pitt Tyler Durden Fight Club, Russell Crowe Maximus Gladiator, Heath Ledger Joker), "
+        "franchise/video game name for game characters (e.g. Red Dead Redemption 2 Arthur Morgan, God of War Kratos, Tomb Raider Lara Croft), "
+        "actor/show for Turkish series (e.g. Gurkan Uygun Memati Bas Kurtlar Vadisi), "
+        "food/plate for dishes (e.g. tatlisi tatli tabak for Kazandibi). "
+        "Return a strict JSON object mapping original name to search query."
+    )
+    try:
+        raw = call_gemini_sync("", sys_prompt, json.dumps(needed, ensure_ascii=False))
+        parsed = extract_json_object(raw)
+        if isinstance(parsed, dict):
+            for k, v in parsed.items():
+                if isinstance(v, str) and v.strip():
+                    DISAMBIGUATION_ANCHORS[k.strip().lower()] = v.strip()
+            return parsed
+    except Exception:
+        pass
+    return {}
 
 
 def resolve_wiki_image_sync(term: str) -> Optional[str]:
@@ -422,7 +461,7 @@ def resolve_wiki_image_sync(term: str) -> Optional[str]:
                         turl = data.get("turl")
                         title = data.get("t", "")
                         desc = data.get("desc", "")
-                        if not turl:
+                        if not turl or "explicit.bing.net" in turl:
                             continue
 
                         meta = (title + " " + desc).lower()
@@ -458,12 +497,21 @@ def resolve_wiki_image_sync(term: str) -> Optional[str]:
                     p_title = p.get("title", "")
                     p_desc = p.get("description", "") or ""
                     thumb = p.get("thumbnail", {}).get("source")
-                    if thumb and (k_lower in p_title.lower() or p_title.lower() in k_lower):
-                        meta = (p_title + " " + p_desc).lower()
-                        if not any(b in meta for b in BAD_IMAGE_KEYWORDS):
-                            IMAGE_CACHE[key] = thumb
-                            save_image_cache_to_disk()
-                            return thumb
+                    if not thumb:
+                        continue
+                    p_title_lower = p_title.lower()
+                    # Disambiguation guard: avoid partial word matching (e.g. "Arthur (dizi)" for "Arthur Morgan")
+                    if len(k_lower.split()) > 1:
+                        if k_lower not in p_title_lower and p_title_lower not in k_lower:
+                            continue
+                    else:
+                        if k_lower != p_title_lower and not p_title_lower.startswith(k_lower + " "):
+                            continue
+                    meta = (p_title + " " + p_desc).lower()
+                    if not any(b in meta for b in BAD_IMAGE_KEYWORDS):
+                        IMAGE_CACHE[key] = thumb
+                        save_image_cache_to_disk()
+                        return thumb
         except Exception:
             pass
 
@@ -623,9 +671,10 @@ class Player:
 
 
 class Room:
-    def __init__(self, code: str, host_id: str):
+    def __init__(self, code: str, host_id: str, host_token: str = ""):
         self.code = code
         self.host_id = host_id
+        self.host_token = host_token or secrets.token_hex(16)
         self.phase = "setup"
         self.scenario = "Bu karakterler savaşa girse hangi takım kazanır?"
         self.starting_budget = 30
@@ -684,14 +733,36 @@ class Room:
         self.turn_index = (self.turn_index + 1) % len(self.players)
         self.get_turn_player()
 
-    def add_player(self, pid: str, name: str) -> Player:
+    def add_player(self, pid: str, name: str, host_token: str = "") -> Player:
+        is_host_by_token = bool(host_token and host_token == self.host_token)
+        if is_host_by_token:
+            self.host_id = pid
+
         existing = self.get_player(pid)
         if existing:
-            existing.name = name
+            if name:
+                existing.name = name
+            if is_host_by_token:
+                self.host_id = pid
             return existing
+
+        # Deduplicate by player name (case-insensitive) to prevent ghost duplicate seats on reconnect
+        clean_name = name.strip()
+        for p in self.players:
+            if clean_name and p.name.strip().lower() == clean_name.lower():
+                old_pid = p.id
+                p.id = pid
+                if old_pid in self.connections:
+                    self.connections.pop(old_pid, None)
+                if old_pid == self.host_id or is_host_by_token:
+                    self.host_id = pid
+                return p
+
         color_idx = len(self.players) % 8
-        p = Player(pid, name, color_idx, self.starting_budget, self.roster_capacity)
+        p = Player(pid, clean_name or "Oyuncu", color_idx, self.starting_budget, self.roster_capacity)
         self.players.append(p)
+        if is_host_by_token or pid == self.host_id:
+            self.host_id = pid
         return p
 
     def all_players_finished(self) -> bool:
@@ -709,6 +780,7 @@ class Room:
             "type": "state",
             "roomCode": self.code,
             "hostId": self.host_id,
+            "isHost": bool(viewer_id == self.host_id),
             "viewerId": viewer_id,
             "phase": self.phase,
             "scenario": self.scenario,
@@ -787,6 +859,14 @@ async def preload_room_images(room: Room, names: List[str]):
     if not missing:
         return
 
+    # Dynamic disambiguation for any names without known anchors using Gemini
+    unanchored = [n for n in missing if n.strip().lower() not in DISAMBIGUATION_ANCHORS]
+    if unanchored:
+        try:
+            await asyncio.to_thread(disambiguate_names_sync, unanchored)
+        except Exception:
+            pass
+
     batch_size = 8
     for i in range(0, len(missing), batch_size):
         batch = missing[i : i + batch_size]
@@ -833,35 +913,39 @@ async def start_spin_sequence(room: Room):
     if not candidates:
         candidates = [winner]
 
-    window_size = min(3, len(candidates) - 1) if len(candidates) > 1 else 0
+    others = [c for c in candidates if c["name"] != winner["name"]]
+    if not others:
+        others = candidates
+
     reel_raw: List[Optional[Dict[str, Any]]] = [None] * total_cards
     reel_raw[win_idx] = winner
+
+    # Cycle shuffle deck generator: ensures wide, vibrant variety across reel with zero adjacent repeats
+    deck: List[Dict[str, Any]] = []
+    def refill_deck():
+        nonlocal deck
+        shuffled = list(candidates)
+        random.shuffle(shuffled)
+        deck.extend(shuffled)
 
     for i in range(total_cards):
         if i == win_idx:
             continue
-        recent_names = set()
-        for offset in range(1, window_size + 1):
-            if i - offset >= 0 and reel_raw[i - offset] is not None:
-                recent_names.add(reel_raw[i - offset]["name"])
-        if i == win_idx - 1:
-            recent_names.add(winner["name"])
+        # Immediate neighbors of winner must never duplicate the winner card
+        if i == win_idx - 1 or i == win_idx + 1:
+            reel_raw[i] = random.choice(others)
+            continue
 
-        valid = [c for c in candidates if c["name"] not in recent_names]
-        if not valid:
-            prev_name = reel_raw[i - 1]["name"] if i > 0 and reel_raw[i - 1] is not None else None
-            valid = [c for c in candidates if c["name"] != prev_name]
-            if not valid:
-                valid = candidates
-
-        reel_raw[i] = random.choice(valid)
-
-    # Sanity check: after win_idx, ensure win_idx + 1 is not the winner if multiple candidates exist
-    if win_idx + 1 < total_cards and len(candidates) > 1:
-        if reel_raw[win_idx + 1]["name"] == winner["name"]:
-            valid = [c for c in candidates if c["name"] != winner["name"]]
-            if valid:
-                reel_raw[win_idx + 1] = random.choice(valid)
+        if not deck:
+            refill_deck()
+        card = deck.pop(0)
+        # Avoid direct adjacent duplicate with previous card
+        if i > 0 and reel_raw[i - 1] is not None and reel_raw[i - 1]["name"] == card["name"] and len(candidates) > 1:
+            if not deck:
+                refill_deck()
+            deck.append(card)
+            card = deck.pop(0)
+        reel_raw[i] = card
 
     reel = []
     for item in reel_raw:
@@ -1426,13 +1510,14 @@ async def index():
 
 
 @app.post("/api/create-room")
-async def api_create_room( payload: Dict[str, Any]):
+async def api_create_room(payload: Dict[str, Any]):
     host_id = str(payload.get("playerId") or "").strip()
     if not host_id:
         return {"ok": False, "error": "Geçersiz oyuncu kimliği."}
     code = generate_secret_room_code(6)
-    ROOMS[code] = Room(code, host_id)
-    return {"ok": True, "roomCode": code}
+    host_token = secrets.token_hex(16)
+    ROOMS[code] = Room(code, host_id, host_token)
+    return {"ok": True, "roomCode": code, "hostToken": host_token}
 
 
 @app.get("/api/check-room")
@@ -1485,7 +1570,8 @@ async def ws_endpoint(websocket: WebSocket, room_code: str, player_id: str):
 
             if action == "join":
                 name = (data.get("name") or "Oyuncu").strip()[:24]
-                room.add_player(player_id, name)
+                host_token = str(data.get("hostToken") or "").strip()
+                room.add_player(player_id, name, host_token)
                 await room.broadcast_state()
                 asyncio.create_task(preload_room_images(room, room.pool_names[:30]))
 

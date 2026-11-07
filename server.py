@@ -965,8 +965,8 @@ async def start_spin_sequence(room: Room):
         room.round_mode = "dutch"
     elif room.auction_type == "classic":
         room.round_mode = "classic"
-    else:  # mixed mode: 38% surprise Dutch auction rounds
-        room.round_mode = "dutch" if random.random() < 0.38 else "classic"
+    else:  # mixed mode: 10% surprise Dutch auction rounds
+        room.round_mode = "dutch" if random.random() < 0.10 else "classic"
 
     room.reel_sequence = reel
     room.reel_winner_index = win_idx

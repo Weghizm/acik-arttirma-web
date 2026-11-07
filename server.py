@@ -958,7 +958,7 @@ async def start_spin_sequence(room: Room):
 
     room.reel_sequence = reel
     room.reel_winner_index = win_idx
-    room.reel_offset_px = round(random.uniform(-34.0, 34.0), 1)
+    room.reel_offset_px = round(random.uniform(-10.0, 10.0), 1)
 
     await room.broadcast_event({
         "type": "spin_start",

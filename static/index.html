@@ -832,6 +832,13 @@
     .reel-card.tier-pembe { border-color: #EC4899; }
     .reel-card.tier-kirmizi { border-color: #EF4444; }
     .reel-card.tier-altin { border-color: var(--gold); }
+    .reel-card.reel-winner-glow {
+      border-color: #F59E0B !important;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.9), inset 0 0 10px rgba(245, 158, 11, 0.45) !important;
+      transform: scale(1.05);
+      z-index: 10;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    }
 
     .reel-img-box {
       width: 100%;
@@ -1851,7 +1858,7 @@
       .reel-card {
         width: 80px;
         height: 80px;
-        margin: 0 3px;
+        margin: 0 4px;
       }
       .bidding-podium {
         padding: 8px 10px;
@@ -2740,8 +2747,18 @@
         oppBar.appendChild(card);
       });
 
-      if (!isReelAnimating && roomState.auctionState === "idle") {
-        populateStaticReelPreview();
+      if (!isReelAnimating) {
+        if (roomState.auctionState === "idle") {
+          populateStaticReelPreview();
+        } else if (roomState.auctionState === "bidding" && roomState.currentEntry) {
+          hydrateReelImagesInPlace();
+          const track = document.getElementById("reelTrack");
+          if (!track.children.length) {
+            renderMidAuctionReel(roomState.currentEntry);
+          }
+        } else {
+          hydrateReelImagesInPlace();
+        }
       } else {
         hydrateReelImagesInPlace();
       }
@@ -3039,22 +3056,70 @@
       track.innerHTML = items.map(buildReelCardHtml).join("");
     }
 
+    function renderMidAuctionReel(entry) {
+      const track = document.getElementById("reelTrack");
+      const viewport = document.getElementById("reelViewport");
+      if (!entry || !track || !viewport) return;
+      const names = roomState.poolNames && roomState.poolNames.length ? roomState.poolNames : [entry.name];
+      const items = [];
+      const winIdx = 8;
+      for (let i = 0; i < 17; i++) {
+        if (i === winIdx) {
+          items.push({ name: entry.name, image: entry.image || roomState.imageCache?.[entry.name], tier: entry.tier || "altin" });
+        } else {
+          const n = names[i % names.length];
+          items.push({ name: n, image: roomState.imageCache?.[n], tier: "mavi" });
+        }
+      }
+      track.innerHTML = items.map(buildReelCardHtml).join("");
+      void track.offsetWidth;
+      const targetCard = track.children[winIdx];
+      if (targetCard) {
+        const cardCenter = targetCard.offsetLeft + (targetCard.offsetWidth / 2);
+        const centerLine = viewport.clientWidth / 2;
+        track.style.transform = `translateX(${-(cardCenter - centerLine)}px)`;
+        targetCard.classList.add("reel-winner-glow");
+      }
+    }
+
     function runSynchronizedReelSpin(msg) {
       isReelAnimating = true;
       const track = document.getElementById("reelTrack");
       const viewport = document.getElementById("reelViewport");
 
+      // Clear any prior winner glows
+      track.querySelectorAll(".reel-winner-glow").forEach(el => el.classList.remove("reel-winner-glow"));
+
       track.innerHTML = msg.reel.map(buildReelCardHtml).join("");
       track.style.transform = "translateX(0px)";
 
-      const firstCardEl = track.querySelector(".reel-card");
-      const cardRectWidth = firstCardEl ? firstCardEl.getBoundingClientRect().width : 80;
-      const fullCardWidth = cardRectWidth + 8; // kart genişliği + 4px sol + 4px sağ margin
-      const maxOffset = Math.floor(cardRectWidth * 0.34);
-      const safeOffset = Math.max(-maxOffset, Math.min(maxOffset, msg.offsetPx || 0));
-      const centerLine = viewport.offsetWidth / 2;
-      const cardCenter = (msg.winnerIndex * fullCardWidth) + (fullCardWidth / 2) + 10 + safeOffset;
-      const targetTranslateX = -(cardCenter - centerLine);
+      // Force synchronous reflow so card elements and offsetLeft are populated
+      void track.offsetWidth;
+
+      const winIdx = typeof msg.winnerIndex === "number" ? msg.winnerIndex : 52;
+      const targetCardEl = track.children[winIdx];
+
+      if (!targetCardEl) {
+        isReelAnimating = false;
+        return;
+      }
+
+      // Exact DOM measurements (accounts for padding, margin, scale & viewport width on all devices)
+      const cardWidth = targetCardEl.offsetWidth || 80;
+      const cardOffsetLeft = targetCardEl.offsetLeft;
+      const viewportCenter = viewport.clientWidth / 2;
+
+      // Micro-jitter: strictly limited to ±12px (well inside the card's 80px boundary)
+      const maxJitter = Math.floor(cardWidth * 0.15); // max 12px
+      const jitter = Math.max(-maxJitter, Math.min(maxJitter, msg.offsetPx || 0));
+
+      const cardCenter = cardOffsetLeft + (cardWidth / 2) + jitter;
+      const targetTranslateX = -(cardCenter - viewportCenter);
+
+      // Distance between cards for sound ticks
+      const stride = (track.children.length > 1)
+        ? (track.children[1].offsetLeft - track.children[0].offsetLeft)
+        : 88;
 
       const durationMs = msg.durationMs || 4600;
       const startTime = performance.now();
@@ -3071,8 +3136,8 @@
         const currentX = targetTranslateX * eased;
         track.style.transform = `translateX(${currentX}px)`;
 
-        const pointerX = Math.abs(currentX) + centerLine - 10;
-        const idx = Math.floor(pointerX / fullCardWidth);
+        const pointerX = Math.abs(currentX) + viewportCenter;
+        const idx = Math.floor(pointerX / stride);
         if (idx > lastTickIndex && idx < msg.reel.length) {
           playMechanicalTick();
           lastTickIndex = idx;
@@ -3082,6 +3147,8 @@
           requestAnimationFrame(step);
         } else {
           isReelAnimating = false;
+          // Highlight the exact winning card under the needle with an amber glow
+          targetCardEl.classList.add("reel-winner-glow");
         }
       }
 

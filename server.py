@@ -314,9 +314,55 @@ CARDS_BY_ID = {c["cardID"]: c for c in CARDS_CATALOG}
 
 
 # ============================================================================
-# 3. DYNAMIC IMAGE RESOLVER & CACHE (Wikipedia REST + MediaWiki Search)
+# 3. UNIVERSAL DYNAMIC IMAGE RESOLVER & PERSISTENT CACHE (Bing Images + Wiki)
 # ============================================================================
+IMAGE_CACHE_PATH = os.path.join(os.path.dirname(__file__), "data", "image_cache.json")
 IMAGE_CACHE: Dict[str, Optional[str]] = {}
+
+# Load persistent image cache if present on disk
+try:
+    if os.path.exists(IMAGE_CACHE_PATH):
+        with open(IMAGE_CACHE_PATH, "r", encoding="utf-8") as _f:
+            _loaded = json.load(_f)
+            if isinstance(_loaded, dict):
+                IMAGE_CACHE.update(_loaded)
+except Exception:
+    pass
+
+
+def save_image_cache_to_disk() -> None:
+    try:
+        os.makedirs(os.path.dirname(IMAGE_CACHE_PATH), exist_ok=True)
+        with open(IMAGE_CACHE_PATH, "w", encoding="utf-8") as _f:
+            json.dump(IMAGE_CACHE, _f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+
+# Common single-word entities that require specific disambiguation anchors
+DISAMBIGUATION_ANCHORS = {
+    "maximus": "Maximus Gladiator character portrait",
+    "arthur morgan": "Arthur Morgan Red Dead Redemption 2 portrait",
+    "joker": "Joker DC character portrait",
+    "blade": "Blade Marvel character portrait",
+    "flash": "The Flash DC superhero portrait",
+    "thor": "Thor Marvel character portrait",
+    "ezel": "Ezel Bayraktar dizi portrait",
+    "ramiz dayı": "Ramiz Karaeski Dayı Ezel portrait",
+    "polat alemdar": "Polat Alemdar Kurtlar Vadisi portrait",
+    "recep ivedik": "Recep İvedik film portrait",
+    "süleyman çakır": "Süleyman Çakır Kurtlar Vadisi portrait",
+    "memati baş": "Memati Baş Kurtlar Vadisi portrait",
+    "vito corleone": "Vito Corleone Godfather portrait",
+    "walter white": "Walter White Breaking Bad portrait",
+}
+
+# Negative keywords: reject results containing coins, anatomy, contractors, maps, or clipart logos
+BAD_IMAGE_KEYWORDS = {
+    "coin", "madeni para", "harita", "map", "logo", "vector", "vektör", "clipart",
+    "contractor", "gluteus", "muscle", "anatomi", "anatomy", "flag", "bayrak",
+    "dizi indir", "transparent png", "png icon", "clip art", "free icon", "download png", "madalyon"
+}
 
 
 def resolve_wiki_image_sync(term: str) -> Optional[str]:
@@ -326,63 +372,89 @@ def resolve_wiki_image_sync(term: str) -> Optional[str]:
     if key in IMAGE_CACHE and IMAGE_CACHE[key] is not None:
         return IMAGE_CACHE[key]
 
-    # 1. Primary: Microsoft Bing Smart-Cropped Image Engine (c=7 AI Face/Subject Square Crop)
-    try:
-        bing_url = (
-            "https://www.bing.com/images/async?q="
-            + urllib.parse.quote(key)
-            + "&first=0&count=5&adlt=off"
-        )
-        req = urllib.request.Request(
-            bing_url,
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-                "Accept-Language": "tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7",
-            },
-        )
-        with urllib.request.urlopen(req, timeout=4.0) as resp:
-            raw = resp.read().decode("utf-8", errors="ignore")
-            unesc = html.unescape(raw)
-            turls = re.findall(r'"turl":"(https://[^"]+)"', unesc)
-            if turls:
-                smart_thumb = turls[0] + "&w=400&h=400&c=7&r=0&o=5"
-                IMAGE_CACHE[key] = smart_thumb
-                return smart_thumb
-    except Exception:
-        pass
+    k_lower = key.lower()
 
-    # 2. Fallback: Wikipedia REST + MediaWiki Search
-    headers = {"User-Agent": "AcikArttirmaWeb/2.0 (https://arsivizm.xyz)"}
+    # Generate prioritized candidate queries for dynamic search
+    queries = []
+    if k_lower in DISAMBIGUATION_ANCHORS:
+        queries.append(DISAMBIGUATION_ANCHORS[k_lower])
 
-    for lang in ("tr", "en"):
-        url = f"https://{lang}.wikipedia.org/api/rest_v1/page/summary/{urllib.parse.quote(key)}"
+    if any(w in k_lower for w in ["character", "karakter", "film", "dizi", "oyun", "movie", "game"]):
+        queries.append(f"{key} portrait")
+        queries.append(key)
+    else:
+        queries.append(f"{key} character portrait")
+        queries.append(f"{key} portrait")
+        queries.append(f"{key} dizi film")
+        queries.append(key)
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept-Language": "tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7",
+    }
+
+    # 1. Primary: Microsoft Bing Images Engine with Turkish locale context and smart filtering
+    for q in queries:
         try:
-            req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=2.5) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-                thumb = data.get("thumbnail", {}).get("source")
-                if thumb:
-                    IMAGE_CACHE[key] = thumb
-                    return thumb
-        except Exception:
-            pass
+            bing_url = (
+                "https://www.bing.com/images/async?q="
+                + urllib.parse.quote(q)
+                + "&first=0&count=12&adlt=off&cc=tr&setlang=tr"
+            )
+            req = urllib.request.Request(bing_url, headers=headers)
+            with urllib.request.urlopen(req, timeout=3.5) as resp:
+                raw = resp.read().decode("utf-8", errors="ignore")
+                unesc = html.unescape(raw)
 
+                for m in re.finditer(r'm="({.*?})"', unesc):
+                    try:
+                        data = json.loads(m.group(1))
+                        turl = data.get("turl")
+                        title = data.get("t", "")
+                        desc = data.get("desc", "")
+                        if not turl:
+                            continue
+
+                        meta = (title + " " + desc).lower()
+                        if any(b in meta for b in BAD_IMAGE_KEYWORDS):
+                            continue
+
+                        # Clean thumbnail URL: preserve native ratio without white letterboxing!
+                        # NEVER append &w=400&h=400 which forces Bing to pad white borders!
+                        clean_url = turl.split("&w=")[0].split("&h=")[0]
+                        if "&pid=" not in clean_url:
+                            clean_url += "&pid=15.1"
+
+                        IMAGE_CACHE[key] = clean_url
+                        save_image_cache_to_disk()
+                        return clean_url
+                    except Exception:
+                        continue
+        except Exception:
+            continue
+
+    # 2. Fallback: Wikipedia with strict relevance and disambiguation check
     for lang in ("tr", "en"):
         url = (
             f"https://{lang}.wikipedia.org/w/api.php?action=query&generator=search"
-            f"&gsrsearch={urllib.parse.quote(key)}&gsrlimit=1&prop=pageimages"
-            f"&pithumbsize=330&format=json"
+            f"&gsrsearch={urllib.parse.quote(key)}&gsrlimit=3&prop=pageimages|description"
+            f"&pithumbsize=400&format=json"
         )
         try:
-            req = urllib.request.Request(url, headers=headers)
+            req = urllib.request.Request(url, headers={"User-Agent": "AcikArttirma/2.0 (contact@arsivizm.xyz)"})
             with urllib.request.urlopen(req, timeout=2.5) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
                 pages = data.get("query", {}).get("pages", {})
                 for _, p in pages.items():
+                    p_title = p.get("title", "")
+                    p_desc = p.get("description", "") or ""
                     thumb = p.get("thumbnail", {}).get("source")
-                    if thumb:
-                        IMAGE_CACHE[key] = thumb
-                        return thumb
+                    if thumb and (k_lower in p_title.lower() or p_title.lower() in k_lower):
+                        meta = (p_title + " " + p_desc).lower()
+                        if not any(b in meta for b in BAD_IMAGE_KEYWORDS):
+                            IMAGE_CACHE[key] = thumb
+                            save_image_cache_to_disk()
+                            return thumb
         except Exception:
             pass
 
@@ -654,7 +726,16 @@ class Room:
             "cardsCatalog": CARDS_CATALOG,
             "judgeEvaluating": self.judge_evaluating,
             "judgeResult": self.judge_result,
-            "imageCache": {name: IMAGE_CACHE.get(name) for name in self.pool_names if IMAGE_CACHE.get(name)},
+            "imageCache": {
+                name: IMAGE_CACHE.get(name)
+                for name in (
+                    set(self.pool_names)
+                    | {e.get("name") for e in self.pool_entries if e.get("name")}
+                    | {pur.get("name") for p in self.players for pur in p.purchases if pur.get("name")}
+                    | ({self.current_entry.get("name")} if self.current_entry and self.current_entry.get("name") else set())
+                )
+                if IMAGE_CACHE.get(name)
+            },
         }
 
     async def broadcast_state(self):

@@ -2688,7 +2688,7 @@
         lotSub.textContent = entry.category || roomState.scenario || `Sıra: ${turnName}`;
         const img = entry.image || (roomState.imageCache && roomState.imageCache[entry.name]);
         lotThumb.innerHTML = img
-          ? `<img src="${img}" alt="${escapeHtml(entry.name)}" referrerpolicy="no-referrer" />`
+          ? `<img src="${img}" alt="${escapeHtml(entry.name)}" referrerpolicy="no-referrer" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" /><div class="lot-avatar-placeholder" style="display:none">${escapeHtml(entry.name.slice(0, 10))}</div>`
           : `<div class="lot-avatar-placeholder">${escapeHtml(entry.name.slice(0, 10))}</div>`;
 
         document.getElementById("bidHighestVal").textContent = `${roomState.highestBid} ₺`;
@@ -2882,7 +2882,7 @@
     function buildReelCardHtml(item) {
       const img = item.image || (roomState?.imageCache && roomState.imageCache[item.name]);
       const visual = img
-        ? `<img class="reel-img-main" src="${img}" alt="${escapeHtml(item.name)}" referrerpolicy="no-referrer" />`
+        ? `<img class="reel-img-main" src="${img}" alt="${escapeHtml(item.name)}" referrerpolicy="no-referrer" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" /><div class="reel-card-placeholder" style="display:none">${escapeHtml(item.name.slice(0, 8))}</div>`
         : `<div class="reel-card-placeholder">${escapeHtml(item.name.slice(0, 8))}</div>`;
 
       return `
@@ -2900,7 +2900,7 @@
         const name = box.getAttribute("data-item-name");
         const img = roomState.imageCache[name];
         if (img) {
-          box.innerHTML = `<img class="reel-img-main" src="${img}" alt="${escapeHtml(name)}" referrerpolicy="no-referrer" />`;
+          box.innerHTML = `<img class="reel-img-main" src="${img}" alt="${escapeHtml(name)}" referrerpolicy="no-referrer" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" /><div class="reel-card-placeholder" style="display:none">${escapeHtml(name.slice(0, 8))}</div>`;
         }
       });
     }

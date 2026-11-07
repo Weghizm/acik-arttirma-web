@@ -1807,6 +1807,24 @@
     }
 
     @media (max-width: 600px) {
+      .navbar {
+        padding: 0 8px;
+        height: 48px;
+        gap: 6px;
+      }
+      .nav-left {
+        gap: 6px;
+        flex-shrink: 0;
+      }
+      .nav-right {
+        gap: 4px;
+        flex-shrink: 0;
+      }
+      .nav-right .btn {
+        padding: 5px 8px;
+        font-size: 11px;
+        white-space: nowrap;
+      }
       #gameView {
         padding: 6px 6px 14px;
         gap: 6px;
@@ -1940,12 +1958,10 @@
         <span class="hide-mobile">AÇIK ARTTIRMA</span>
       </div>
       <span class="chip gold" id="topRoomPill" style="display:none;font-family:'JetBrains Mono',monospace;font-weight:800;cursor:pointer" onclick="copyInviteLink()" title="Masa kodunu kopyala">Masa: -</span>
-      <span class="chip emerald" id="topRemainingPill">25 isim</span>
       <span class="chip" id="reconnectPill" style="display:none;background:rgba(239,68,68,0.25);color:#FCA5A5;border:1px solid rgba(239,68,68,0.45);font-weight:700;font-size:11px">🔄 Yeniden bağlanılıyor...</span>
     </div>
 
     <div class="nav-right">
-      <button class="btn" id="btnAllRostersTop" style="display:none" onclick="openAllRostersModal()">👥 Kadrolar</button>
       <button class="btn" id="btnOpenShopTop" style="display:none" onclick="openShopModal()">Mağaza</button>
       <button class="btn" id="btnUndoTop" style="display:none" onclick="sendUndo()">↺ Geri Al</button>
       <button class="btn" id="btnLobbyTop" style="display:none" onclick="sendReturnLobby()">Lobi</button>
@@ -2200,18 +2216,18 @@
             <span id="myStatusBadges" style="display:inline-flex;gap:4px"></span>
           </div>
           <button type="button" class="btn-toggle-secret-cards" onclick="toggleSecretCardsSheet()">
-            <span id="secretCardsCountLabel">Gizli Kartlar</span>
+            <span id="secretCardsCountLabel">Kartların</span>
             <span class="toggle-arrow">▲</span>
           </button>
         </div>
         <div class="slots-five-grid" id="myRosterGrid"></div>
       </div>
 
-      <!-- GİZLİ AKSİYON KARTLARIM (COLLAPSIBLE / DRAWER) -->
+      <!-- AKSİYON KARTLARIM (COLLAPSIBLE / DRAWER) -->
       <div class="secret-hand-drawer" id="secretCardsContainer">
         <div class="secret-drawer-header">
           <div class="secret-title-col">
-            <span class="secret-title">GİZLİ AKSİYON KARTLARIN</span>
+            <span class="secret-title">KARTLARIN</span>
             <span class="secret-subtitle">Sadece sen görürsün • Taktik kartını oynamak için dokun</span>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
@@ -2245,8 +2261,8 @@
     <div class="modal-dialog">
       <div class="modal-header">
         <div style="display:flex;align-items:center;gap:10px">
-          <h3>Gizli Kart Mağazası</h3>
-          <span class="hide-mobile" style="font-size:12px;color:var(--text-muted);font-weight:600">Jüri puanlarınla taktiksel gizli kartlar satın al</span>
+          <h3>Kart Mağazası</h3>
+          <span class="hide-mobile" style="font-size:12px;color:var(--text-muted);font-weight:600">Jüri puanlarınla taktiksel kartlar satın al</span>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
           <span class="chip gold" id="shopModalPoints" style="font-family:'JetBrains Mono';font-weight:800">0 P</span>
@@ -2612,12 +2628,9 @@
       const topRoomPill = document.getElementById("topRoomPill");
       topRoomPill.style.display = "inline-flex";
       topRoomPill.textContent = `Masa: #${roomState.roomCode}`;
-      document.getElementById("topRemainingPill").textContent = `${roomState.availableCount} isim`;
 
       const isHost = Boolean(roomState.isHost || (roomState.hostId === myPlayerId));
       const isGameOrAfter = roomState.phase !== "setup";
-      const btnAllRosters = document.getElementById("btnAllRostersTop");
-      if (btnAllRosters) btnAllRosters.style.display = isGameOrAfter ? "inline-flex" : "none";
       document.getElementById("btnOpenShopTop").style.display = isGameOrAfter ? "inline-flex" : "none";
       document.getElementById("btnUndoTop").style.display = (isHost && isGameOrAfter) ? "inline-flex" : "none";
       document.getElementById("btnLobbyTop").style.display = (isHost && isGameOrAfter) ? "inline-flex" : "none";
@@ -2875,15 +2888,16 @@
           rGrid.appendChild(slot);
         }
 
-        // Gizli Kartlar (Collapsible Drawer)
+        // Kartların (Collapsible Drawer)
         const hGrid = document.getElementById("mySecretHandGrid");
         hGrid.innerHTML = "";
-        const invCount = me.inventory ? me.inventory.length : 0;
+        const invCount = me.inventory ? me.inventory.filter(Boolean).length : 0;
         const btnCountEl = document.getElementById("secretCardsCountLabel");
         if (btnCountEl) {
           const container = document.getElementById("secretCardsContainer");
           const isOpen = container && container.classList.contains("open");
-          btnCountEl.textContent = isOpen ? `Gizli Kartları Gizle ▼` : `${invCount} Gizli Kartın Var ▲`;
+          const countText = invCount > 0 ? `Kartların (${invCount})` : `Kartların`;
+          btnCountEl.textContent = isOpen ? `Kartları Kapat ▼` : `${countText} ▲`;
         }
 
         for (let i = 0; i < 5; i++) {
@@ -2893,7 +2907,7 @@
             const isSilenced = me.silencedRounds > 0;
             slot.className = isSilenced ? "slot-box interactive debuff-locked" : "slot-box interactive";
             slot.title = isSilenced
-              ? `🔒 MÜHÜRLÜ (${me.silencedRounds} tur boyunca gizli kart kullanamazsın)`
+              ? `🔒 MÜHÜRLÜ (${me.silencedRounds} tur boyunca kart kullanamazsın)`
               : `${card.cardName}: ${card.description} (Oynamak için tıkla)`;
             slot.onclick = () => onSecretCardClicked(i, card);
             slot.innerHTML = `
@@ -3007,11 +3021,12 @@
       container.classList.toggle("open");
       const btnLabel = document.getElementById("secretCardsCountLabel");
       const me = roomState?.me;
-      const count = me?.inventory?.length || 0;
+      const count = me?.inventory ? me.inventory.filter(Boolean).length : 0;
       if (btnLabel) {
+        const countText = count > 0 ? `Kartların (${count})` : `Kartların`;
         btnLabel.textContent = container.classList.contains("open") 
-          ? `Gizli Kartları Gizle ▼` 
-          : `${count} Gizli Kartın Var ▲`;
+          ? `Kartları Kapat ▼` 
+          : `${countText} ▲`;
       }
     }
 
@@ -3254,7 +3269,7 @@
 
     function onSecretCardClicked(slotIndex, card) {
       if (roomState?.me?.silencedRounds > 0) {
-        showToast(`Mühürlendin! ${roomState.me.silencedRounds} tur boyunca gizli kart kullanamazsın.`);
+        showToast(`Mühürlendin! ${roomState.me.silencedRounds} tur boyunca kart kullanamazsın.`);
         return;
       }
       if (card.targetType === "SingleTargetPlayer") {

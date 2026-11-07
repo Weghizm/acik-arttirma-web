@@ -1712,6 +1712,15 @@ async def ws_endpoint(websocket: WebSocket, room_code: str, player_id: str):
                             pass
                     await room.broadcast_state()
 
+            elif action == "leave_room":
+                if room.phase == "setup":
+                    room.players = [p for p in room.players if p.id != player_id]
+                    if player_id == room.host_id and room.players:
+                        room.host_id = room.players[0].id
+                room.connections.pop(player_id, None)
+                await room.broadcast_state()
+                break
+
             elif action == "ai_pool_chat":
                 prompt_text = (data.get("prompt") or "").strip()
                 api_key_override = (data.get("apiKey") or "").strip()

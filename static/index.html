@@ -2189,7 +2189,7 @@
       <button class="btn" id="btnOpenShopTop" style="display:none" onclick="openShopModal()">Mağaza</button>
       <button class="btn" id="btnUndoTop" style="display:none" onclick="sendUndo()">↺ Geri Al</button>
       <button class="btn" id="btnLobbyTop" style="display:none" onclick="sendReturnLobby()">Lobi</button>
-      <button class="btn" id="btnLeaveRoomTop" style="display:none;border-color:rgba(239,68,68,0.35);color:#FCA5A5" onclick="leaveRoomToGate()" title="Giriş ekranına dön ve isim değiştir">🚪 Girişe Dön</button>
+      <button class="btn" id="btnLeaveRoomTop" style="display:none;border-color:rgba(239,68,68,0.35);color:#FCA5A5" onclick="leaveRoomToGate()" title="Masadan Ayrıl">🚪 Masadan Ayrıl</button>
     </div>
   </header>
 
@@ -2240,7 +2240,7 @@
         <span class="secret-code-pill" id="lobbySecretCode">------</span>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn" onclick="leaveRoomToGate()" style="border-color:rgba(239,68,68,0.4);color:#FCA5A5">🚪 Masadan Ayrıl / İsim Değiştir</button>
+        <button class="btn" onclick="leaveRoomToGate()" style="border-color:rgba(239,68,68,0.4);color:#FCA5A5">🚪 Masadan Ayrıl</button>
         <button class="btn" onclick="copyInviteLink()">🔗 Davet Linkini Kopyala</button>
         <button class="btn btn-gold" id="btnStartGameTop" onclick="sendStartGame()">MÜZAYEDEYİ BAŞLAT →</button>
       </div>
@@ -3625,7 +3625,7 @@
 
     function leaveRoomToGate() {
       if (roomState && roomState.phase === "playing") {
-        if (!confirm("Oyundan ayrılıp ana giriş ekranına (isim değiştirme & masa kurma) dönmek istediğine emin misin?")) {
+        if (!confirm("Masadan ayrılmak istediğine emin misin?")) {
           return;
         }
       }

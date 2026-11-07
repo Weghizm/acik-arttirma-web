@@ -711,6 +711,11 @@ class Room:
         self.judge_evaluating: bool = False
         self.judge_result: Optional[Dict[str, Any]] = None
 
+        self.disaster_triggered: bool = False
+        self.current_disaster: Optional[str] = None  # None, "enflasyon", "elektrik_kesintisi"
+        self.sealed_bids: Dict[str, int] = {}  # pid -> amount
+        self.last_sealed_reveal: Optional[List[Dict[str, Any]]] = None
+
     def get_player(self, pid: str) -> Optional[Player]:
         for p in self.players:
             if p.id == pid:
@@ -811,6 +816,13 @@ class Room:
             "cardsCatalog": CARDS_CATALOG,
             "judgeEvaluating": self.judge_evaluating,
             "judgeResult": self.judge_result,
+            "currentDisaster": self.current_disaster,
+            "disasterTriggered": self.disaster_triggered,
+            "minBidStep": 3 if self.current_disaster == "enflasyon" else 1,
+            "sealedSubmitted": (pid in self.sealed_bids) if self.round_mode == "sealed" else False,
+            "mySealedBid": self.sealed_bids.get(pid) if self.round_mode == "sealed" else None,
+            "sealedCount": len(self.sealed_bids) if self.round_mode == "sealed" else 0,
+            "lastSealedReveal": self.last_sealed_reveal,
             "imageCache": {
                 name: IMAGE_CACHE.get(name)
                 for name in (
@@ -894,7 +906,7 @@ async def start_spin_sequence(room: Room):
         room.phase = "finished"
         room.auction_state = "idle"
         await room.broadcast_state()
-        await trigger_ai_judge(room)
+        asyncio.create_task(trigger_ai_judge(room))
         return
 
     room.auction_state = "spinning"
@@ -960,13 +972,23 @@ async def start_spin_sequence(room: Room):
             "tier": item.get("tier", "mavi"),
         })
 
-    # Determine round mode (Classic English or Dutch Reverse Auction)
-    if room.auction_type == "dutch":
+        # Determine round mode (Power items get Sealed-Bid, otherwise Classic or Dutch)
+    is_power_item = winner.get("tier") in ["altin", "kirmizi"]
+    if is_power_item:
+        room.round_mode = "sealed"
+    elif room.auction_type == "dutch":
         room.round_mode = "dutch"
     elif room.auction_type == "classic":
         room.round_mode = "classic"
     else:  # mixed mode: 10% surprise Dutch auction rounds
         room.round_mode = "dutch" if random.random() < 0.10 else "classic"
+
+    # Single-game disaster check (Only once per entire game)
+    room.current_disaster = None
+    if not room.disaster_triggered and room.current_round >= 3 and room.round_mode != "sealed":
+        if room.current_round >= 5 or random.random() < 0.40:
+            room.disaster_triggered = True
+            room.current_disaster = random.choice(["enflasyon", "elektrik_kesintisi"])
 
     room.reel_sequence = reel
     room.reel_winner_index = win_idx
@@ -986,6 +1008,27 @@ async def start_spin_sequence(room: Room):
     await asyncio.sleep(4.9)
 
     if room.auction_state != "spinning" or room.current_entry != winner:
+        return
+
+    # 0. SEALED-BID AUCTION FLOW (For High-Tier Powerhouse Characters)
+    if room.round_mode == "sealed":
+        room.auction_state = "bidding"
+        room.sealed_bids.clear()
+        room.highest_bid = 0
+        room.highest_bidder_id = None
+        room.highest_bidder_name = None
+        room.bid_deadline = time.time() + 16.0
+
+        await room.broadcast_event({
+            "type": "toast",
+            "level": "warning",
+            "message": f"🤫 GİZLİ TEKLİF TURU! {winner['name']} için teklifler gizli veriliyor. En yüksek veren kapar!",
+        })
+        await room.broadcast_state()
+
+        if room.timer_task and not room.timer_task.done():
+            room.timer_task.cancel()
+        room.timer_task = asyncio.create_task(run_sealed_timer(room, winner["id"]))
         return
 
     # 1. DUTCH (REVERSE) AUCTION FLOW
@@ -1013,7 +1056,8 @@ async def start_spin_sequence(room: Room):
 
     # 2. CLASSIC AUCTION FLOW
     room.auction_state = "bidding"
-    room.bid_deadline = time.time() + room.bid_timer_seconds
+    timer_sec = 6.0 if room.current_disaster == "elektrik_kesintisi" else float(room.bid_timer_seconds)
+    room.bid_deadline = time.time() + timer_sec
 
     turn_p = room.get_turn_player()
     if turn_p and not turn_p.is_finished and turn_p.budget >= 1:
@@ -1021,16 +1065,144 @@ async def start_spin_sequence(room: Room):
         room.highest_bidder_id = turn_p.id
         room.highest_bidder_name = turn_p.name
 
-    await room.broadcast_event({
-        "type": "toast",
-        "level": "info",
-        "message": f"İHALE BAŞLADI: {winner['name']} kürsüde! (Sıra: {turn_p.name if turn_p else '-'} — Taban: 1 ₺)",
-    })
+    if room.current_disaster == "enflasyon":
+        await room.broadcast_event({
+            "type": "toast",
+            "level": "danger",
+            "message": "🚨 ACİL DURUM: ENFLASYON! Bu tur minimum teklif artırımı +3 ₺!",
+        })
+    elif room.current_disaster == "elektrik_kesintisi":
+        await room.broadcast_event({
+            "type": "toast",
+            "level": "warning",
+            "message": "⚡ ACİL DURUM: ELEKTRİK KESİNTİSİ! Jeneratörler yetmiyor, teklif süresi 6 saniyeye indi!",
+        })
+    else:
+        await room.broadcast_event({
+            "type": "toast",
+            "level": "info",
+            "message": f"İHALE BAŞLADI: {winner['name']} kürsüde! (Sıra: {turn_p.name if turn_p else '-'} — Taban: 1 ₺)",
+        })
     await room.broadcast_state()
 
     if room.timer_task and not room.timer_task.done():
         room.timer_task.cancel()
     room.timer_task = asyncio.create_task(run_bidding_timer(room, winner["id"]))
+
+
+async def run_sealed_timer(room: Room, entry_id: str):
+    try:
+        while (room.phase == "playing" and 
+               room.auction_state == "bidding" and 
+               room.round_mode == "sealed" and 
+               room.current_entry and 
+               room.current_entry.get("id") == entry_id):
+            rem = room.bid_deadline - time.time()
+            if rem <= 0:
+                await finalize_sealed_auction(room)
+                break
+            await asyncio.sleep(0.3)
+    except asyncio.CancelledError:
+        pass
+    except Exception as e:
+        print(f"Error in run_sealed_timer: {e}")
+
+
+async def finalize_sealed_auction(room: Room):
+    if room.auction_state != "bidding" or not room.current_entry or room.round_mode != "sealed":
+        return
+
+    if room.timer_task and not room.timer_task.done():
+        room.timer_task.cancel()
+
+    entry = room.current_entry
+    reveal = []
+    for pid, amt in room.sealed_bids.items():
+        p = room.get_player(pid)
+        if p and not p.is_roster_full and p.budget >= amt:
+            reveal.append({"playerId": pid, "playerName": p.name, "amount": amt})
+
+    reveal.sort(key=lambda x: x["amount"], reverse=True)
+    room.last_sealed_reveal = reveal
+
+    winner = None
+    winning_price = 0
+
+    if reveal:
+        top_amt = reveal[0]["amount"]
+        top_candidates = [r for r in reveal if r["amount"] == top_amt]
+        chosen = random.choice(top_candidates)
+        winner = room.get_player(chosen["playerId"])
+        winning_price = chosen["amount"]
+    else:
+        turn_p = room.get_turn_player()
+        if turn_p and not turn_p.is_roster_full and turn_p.budget >= 1:
+            winner = turn_p
+            winning_price = 1
+
+    prev_turn_index = room.turn_index
+
+    if winner and not winner.is_roster_full and winner.budget >= winning_price:
+        entry["state"] = "sold"
+        winner.budget -= winning_price
+        winner.purchases.append({
+            "id": entry["id"],
+            "name": entry["name"],
+            "price": winning_price,
+            "image": entry.get("image") or IMAGE_CACHE.get(entry["name"]),
+        })
+        room.history_stack.append({
+            "type": "sold",
+            "entryId": entry["id"],
+            "buyerId": winner.id,
+            "price": winning_price,
+            "prevTurnIndex": prev_turn_index,
+        })
+        await room.broadcast_event({
+            "type": "sealed_reveal",
+            "entry": entry,
+            "winnerId": winner.id,
+            "winnerName": winner.name,
+            "price": winning_price,
+            "reveal": reveal,
+        })
+        await apply_round_end_effects(room, winner.id)
+    else:
+        entry["state"] = "passed"
+        room.history_stack.append({
+            "type": "passed",
+            "entryId": entry["id"],
+            "prevTurnIndex": prev_turn_index,
+        })
+        await room.broadcast_event({
+            "type": "sealed_reveal",
+            "entry": entry,
+            "winnerId": None,
+            "winnerName": None,
+            "price": 0,
+            "reveal": reveal,
+        })
+        await apply_round_end_effects(room, None)
+
+    room.sealed_bids.clear()
+    room.current_disaster = None
+    room.auction_state = "idle"
+    room.current_entry = None
+    room.highest_bid = 0
+    room.highest_bidder_id = None
+    room.highest_bidder_name = None
+    room.current_round += 1
+    room.advance_turn()
+
+    # Give players 3.8s to see the dramatic reveal of who bid what!
+    await asyncio.sleep(3.8)
+
+    if room.all_players_finished() or not room.available_entries():
+        room.phase = "finished"
+        await room.broadcast_state()
+        asyncio.create_task(trigger_ai_judge(room))
+    else:
+        await room.broadcast_state()
 
 
 async def run_dutch_timer(room: Room, entry_id: str):
@@ -1105,8 +1277,9 @@ async def apply_player_bid(room: Room, player: Player, amount: int) -> Optional[
         return "Bu tur DONDURULDUN! Teklif veremezsin."
     if player.is_roster_full or len(player.purchases) >= player.capacity:
         return "Takım kadron zaten tamamen dolu! Parası kalsa dahi kadrosunu tamamlayanlar teklif veremez."
-    if amount <= room.highest_bid:
-        return f"Teklif mevcut en yüksek tekliften ({room.highest_bid} ₺) büyük olmalı."
+    min_step = 3 if room.current_disaster == "enflasyon" else 1
+    if amount < room.highest_bid + min_step:
+        return f"Teklif en az {room.highest_bid + min_step} ₺ olmalı (Minimum artırım: +{min_step} ₺)."
     if amount > player.budget:
         return f"Yetersiz bütçe! Kalan bütçen: {player.budget} ₺"
 
@@ -1116,8 +1289,9 @@ async def apply_player_bid(room: Room, player: Player, amount: int) -> Optional[
     player.passed_current_item = False
 
     now = time.time()
-    if room.bid_deadline - now < 6.0:
-        room.bid_deadline = now + 6.0
+    ext_sec = 4.0 if room.current_disaster == "elektrik_kesintisi" else 6.0
+    if room.bid_deadline - now < ext_sec:
+        room.bid_deadline = now + ext_sec
 
     await room.broadcast_event({
         "type": "bid_placed",
@@ -1211,6 +1385,7 @@ async def finalize_current_auction(room: Room):
         })
         await apply_round_end_effects(room, None)
 
+    room.current_disaster = None
     room.auction_state = "idle"
     room.current_entry = None
     room.highest_bid = 0
@@ -1222,7 +1397,7 @@ async def finalize_current_auction(room: Room):
     if room.all_players_finished() or not room.available_entries():
         room.phase = "finished"
         await room.broadcast_state()
-        await trigger_ai_judge(room)
+        asyncio.create_task(trigger_ai_judge(room))
     else:
         await room.broadcast_state()
 
@@ -1489,6 +1664,8 @@ async def trigger_ai_judge(room: Room):
 
         raw_engine = await asyncio.to_thread(call_gemini_sync, room.gemini_api_key, ENGINE_SYSTEM_PROMPT, user_prompt)
         engine_res = extract_json_object(raw_engine)
+        if not engine_res.get("TeamScores") or not engine_res.get("WinnerPlayerName"):
+            raise ValueError("Engine JSON missing TeamScores or WinnerPlayerName")
 
         if engine_res.get("Success", True) and engine_res.get("DecisionType") != "INVALID":
             host_lines = [
@@ -1721,6 +1898,38 @@ async def ws_endpoint(websocket: WebSocket, room_code: str, player_id: str):
                 await room.broadcast_state()
                 break
 
+            elif action == "submit_sealed_bid":
+                p = room.get_player(player_id)
+                if (p and room.phase == "playing" and 
+                    room.auction_state == "bidding" and 
+                    room.round_mode == "sealed" and 
+                    not p.is_roster_full and 
+                    p.budget >= 1 and 
+                    not p.is_frozen):
+                    amt = int(data.get("amount", 1))
+                    amt = max(1, min(p.budget, amt))
+                    room.sealed_bids[player_id] = amt
+                    await room.broadcast_state()
+                    active_eligible = [
+                        pl for pl in room.players 
+                        if not pl.is_roster_full and pl.budget >= 1 and not pl.is_frozen
+                    ]
+                    if len(room.sealed_bids) >= len(active_eligible):
+                        await finalize_sealed_auction(room)
+
+            elif action == "finish_game":
+                if player_id == room.host_id and room.phase == "playing":
+                    room.phase = "finished"
+                    room.auction_state = "idle"
+                    if room.timer_task and not room.timer_task.done():
+                        room.timer_task.cancel()
+                    await room.broadcast_state()
+                    asyncio.create_task(trigger_ai_judge(room))
+
+            elif action == "trigger_judge":
+                if player_id == room.host_id:
+                    asyncio.create_task(trigger_ai_judge(room))
+
             elif action == "ai_pool_chat":
                 prompt_text = (data.get("prompt") or "").strip()
                 api_key_override = (data.get("apiKey") or "").strip()
@@ -1759,6 +1968,10 @@ async def ws_endpoint(websocket: WebSocket, room_code: str, player_id: str):
                 room.auction_state = "idle"
                 room.history_stack.clear()
                 room.judge_result = None
+                room.disaster_triggered = False
+                room.current_disaster = None
+                room.sealed_bids.clear()
+                room.last_sealed_reveal = None
 
                 tiers = ["mavi", "mavi", "mavi", "mor", "mor", "pembe", "kirmizi", "altin"]
                 room.pool_entries = []

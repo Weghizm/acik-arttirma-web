@@ -1732,6 +1732,214 @@
     /* ======================================================================
        MODALS
     ====================================================================== */
+    /* GİZLİ TEKLİF BANNERI & PANELİ */
+    .sealed-bid-alert {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.22) 0%, rgba(99, 102, 241, 0.16) 100%);
+      border: 1.5px solid rgba(168, 85, 247, 0.55);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      text-align: center;
+      box-shadow: 0 4px 18px rgba(168, 85, 247, 0.2);
+    }
+    .sealed-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      color: #F3E8FF;
+      background: #7E22CE;
+      border: 1px solid #A855F7;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 4px;
+    }
+    .sealed-desc {
+      font-size: 11.5px;
+      color: #E9D5FF;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+    .sealed-bid-panel {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .sealed-input-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .sealed-input-lbl {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .sealed-stepper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .sealed-stepper .btn-step {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-weight: 900;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .sealed-bid-num {
+      width: 58px;
+      height: 32px;
+      background: var(--bg-input);
+      border: 1.5px solid var(--gold);
+      border-radius: 8px;
+      color: var(--gold);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 15px;
+      text-align: center;
+    }
+    .sealed-budget-info {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+    .sealed-quick-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .btn-sealed-chip {
+      flex: 1;
+      min-width: 44px;
+      padding: 6px 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .btn-sealed-chip.gold {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.45);
+      color: var(--gold);
+    }
+    .btn-submit-sealed {
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(180deg, #A855F7 0%, #7E22CE 100%);
+      border-bottom: 4px solid #581C87;
+      color: white;
+      font-weight: 900;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.08s ease;
+    }
+    .btn-submit-sealed:active {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+    .btn-sealed-sub {
+      font-size: 10px;
+      font-weight: 600;
+      opacity: 0.85;
+      margin-top: 1px;
+    }
+    .sealed-reveal-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+    .sealed-reveal-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .sealed-reveal-item.winner {
+      border-color: var(--gold);
+      background: rgba(245, 158, 11, 0.14);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+    }
+    .sealed-reveal-amt {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    /* AFET / KAOS ALARMI */
+    .disaster-alert-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(185, 28, 28, 0.18) 100%);
+      border: 1.5px solid rgba(239, 68, 68, 0.6);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      animation: disasterPulse 1.4s infinite ease-in-out;
+    }
+    @keyframes disasterPulse {
+      0%, 100% { border-color: rgba(239, 68, 68, 0.6); box-shadow: 0 0 8px rgba(239, 68, 68, 0.25); }
+      50% { border-color: #EF4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+    }
+    .disaster-icon {
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+    .disaster-info {
+      text-align: left;
+    }
+    .disaster-title {
+      font-size: 11px;
+      font-weight: 900;
+      color: #FCA5A5;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+    .disaster-msg {
+      font-size: 12px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+    .finished-podium-panel {
+      text-align: center;
+      padding: 24px 16px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1.5px solid var(--gold);
+      border-radius: 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+    }
+
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -2186,6 +2394,8 @@
     </div>
 
     <div class="nav-right">
+      <button class="btn btn-gold" id="btnFinishGameTop" style="display:none" onclick="sendFinishGame()" title="Müzayedeyi bitir ve jüriyi başlat">🏁 Müzayedeyi Bitir</button>
+      <button class="btn btn-gold" id="btnShowJudgeTop" style="display:none" onclick="renderJudgeModal()" title="Jüri Kararını İncele">🏆 Jüri Kararı</button>
       <button class="btn" id="btnOpenShopTop" style="display:none" onclick="openShopModal()">Mağaza</button>
       <button class="btn" id="btnUndoTop" style="display:none" onclick="sendUndo()">↺ Geri Al</button>
       <button class="btn" id="btnLobbyTop" style="display:none" onclick="sendReturnLobby()">Lobi</button>
@@ -2425,6 +2635,55 @@
           </div>
         </div>
 
+        <!-- DÜNYA ÇAPINDA AFET / KAOS BANNERI -->
+        <div id="disasterBanner" class="disaster-alert-banner" style="display:none">
+          <div class="disaster-icon" id="disasterIcon">🚨</div>
+          <div class="disaster-info">
+            <div class="disaster-title" id="disasterTitle">ACİL DURUM BÜLTENİ</div>
+            <div class="disaster-msg" id="disasterMsg">...</div>
+          </div>
+        </div>
+
+        <!-- GİZLİ TEKLİF UYARI BANNERI -->
+        <div id="sealedBidAlert" class="sealed-bid-alert" style="display:none">
+          <div class="sealed-badge">🤫 GİZLİ TEKLİF TURU</div>
+          <div class="sealed-desc">Bu çok güçlü bir isim! Kimse birbirinin teklifini göremez. Bütçene göre gizli maksimum teklifini gir, en yüksek veren ismi kapar!</div>
+        </div>
+
+        <!-- GİZLİ TEKLİF VERME PANELİ -->
+        <div id="sealedBidPanel" class="sealed-bid-panel" style="display:none">
+          <div class="sealed-input-row">
+            <span class="sealed-input-lbl">Gizli Teklifin:</span>
+            <div class="sealed-stepper">
+              <button type="button" class="btn-step" onclick="adjustSealedBid(-1)">−</button>
+              <input type="number" id="sealedBidAmountInput" class="sealed-bid-num" min="1" value="1" oninput="onSealedBidInput()" />
+              <button type="button" class="btn-step" onclick="adjustSealedBid(1)">+</button>
+            </div>
+            <span class="sealed-budget-info" id="sealedMaxBudgetHint">/ 30 ₺</span>
+          </div>
+          <div class="sealed-quick-chips">
+            <button type="button" class="btn-sealed-chip" onclick="setSealedBid(1)">1 ₺</button>
+            <button type="button" class="btn-sealed-chip" onclick="setSealedBid(3)">3 ₺</button>
+            <button type="button" class="btn-sealed-chip" onclick="setSealedBid(5)">5 ₺</button>
+            <button type="button" class="btn-sealed-chip" onclick="setSealedBid(10)">10 ₺</button>
+            <button type="button" class="btn-sealed-chip gold" onclick="setSealedMax()">Maksimum 🔥</button>
+          </div>
+          <button id="btnSubmitSealedBid" class="btn-submit-sealed" onclick="submitSealedBid()">
+            <span id="btnSubmitSealedText">🔒 GİZLİ TEKLİFİ KİLİTLE</span>
+            <span class="btn-sealed-sub" id="btnSubmitSealedSub">Süre bitince zarflar açılacak • Katılan: 0</span>
+          </button>
+        </div>
+
+        <!-- MÜZAYEDE BİTTİ PANELİ -->
+        <div id="finishedPodiumPanel" class="finished-podium-panel" style="display:none">
+          <div style="font-size:32px;margin-bottom:4px">🏆</div>
+          <div style="font-size:16px;font-weight:900;color:var(--gold);margin-bottom:4px">MÜZAYEDE TAMAMLANDI!</div>
+          <p style="font-size:12px;color:var(--text-sub);margin-bottom:12px">Yapay Zeka jürisi tüm kadroları senaryoya göre puanladı.</p>
+          <button class="btn btn-gold" style="width:100%;padding:12px;font-size:14px;font-weight:800" onclick="renderJudgeModal()">
+            🏆 JÜRİ KARARINI VE SIRALAMAYI GÖR
+          </button>
+        </div>
+
         <!-- 3D TEKLİF BUTONLARI (+1 ₺ VE +3 ₺) -->
         <div id="liveBidButtons" class="live-bid-buttons-grid" style="display:none">
           <button class="btn-bid-plus1" onclick="placeQuickBid(1)">
@@ -2574,6 +2833,17 @@
   <!-- ====================================================================
        MODAL 3: AI JÜRİ MAÇ SONUCU
   ==================================================================== -->
+  <!-- MODAL: GİZLİ TEKLİF ZARF AÇILIMI -->
+  <div class="modal-backdrop" id="sealedRevealModal">
+    <div class="modal-dialog" style="max-width: 440px; text-align: center;">
+      <div style="font-size: 38px; margin-bottom: 4px;">✉️💥</div>
+      <h2 style="color: var(--gold); margin-bottom: 2px;">ZARFLAR AÇILDI!</h2>
+      <div id="sealedRevealSubtitle" style="font-size: 12.5px; color: var(--text-sub); margin-bottom: 14px;"></div>
+      <div id="sealedRevealList" class="sealed-reveal-list"></div>
+      <button class="btn" style="margin-top: 14px; width: 100%;" onclick="closeSealedRevealModal()">Kapat</button>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="judgeModal">
     <div class="modal-dialog" style="max-width:820px">
       <div class="modal-header">
@@ -2857,6 +3127,8 @@
           renderApp();
         } else if (msg.type === "spin_start") {
           runSynchronizedReelSpin(msg);
+        } else if (msg.type === "sealed_reveal") {
+          showSealedRevealModal(msg);
         } else if (msg.type === "card_played") {
           showToast(msg.message);
         } else if (msg.type === "sold") {
@@ -2914,6 +3186,11 @@
       document.getElementById("btnLobbyTop").style.display = (isHost && isGameOrAfter) ? "inline-flex" : "none";
       const btnLeave = document.getElementById("btnLeaveRoomTop");
       if (btnLeave) btnLeave.style.display = "inline-flex";
+
+      const btnFinish = document.getElementById("btnFinishGameTop");
+      if (btnFinish) btnFinish.style.display = (isHost && roomState.phase === "playing") ? "inline-flex" : "none";
+      const btnShowJudge = document.getElementById("btnShowJudgeTop");
+      if (btnShowJudge) btnShowJudge.style.display = (roomState.phase === "finished") ? "inline-flex" : "none";
 
       if (roomState.phase === "setup") {
         document.getElementById("setupView").style.display = "flex";
@@ -3080,7 +3357,53 @@
 
       const dutchBidBtns = document.getElementById("dutchBidButtons");
 
-      if (roomState.auctionState === "idle") {
+      const finishedPanel = document.getElementById("finishedPodiumPanel");
+      const sealedAlert = document.getElementById("sealedBidAlert");
+      const sealedPanel = document.getElementById("sealedBidPanel");
+      const disasterBanner = document.getElementById("disasterBanner");
+      const plus1Btn = document.querySelector(".btn-bid-plus1 .bid-btn-val");
+      const plus3Btn = document.querySelector(".btn-bid-plus3 .bid-btn-val");
+
+      // Disaster Banner update
+      if (disasterBanner) {
+        if (roomState.currentDisaster === "enflasyon") {
+          disasterBanner.style.display = "flex";
+          document.getElementById("disasterIcon").textContent = "🚨";
+          document.getElementById("disasterTitle").textContent = "ACİL DURUM: ENFLASYON!";
+          document.getElementById("disasterMsg").textContent = "Piyasa allak bullak oldu! Bu tura özel minimum teklif artırımı +3 ₺!";
+          if (plus1Btn) plus1Btn.textContent = "+3 ₺";
+          if (plus3Btn) plus3Btn.textContent = "+6 ₺";
+        } else if (roomState.currentDisaster === "elektrik_kesintisi") {
+          disasterBanner.style.display = "flex";
+          document.getElementById("disasterIcon").textContent = "⚡";
+          document.getElementById("disasterTitle").textContent = "ACİL DURUM: ELEKTRİK KESİNTİSİ!";
+          document.getElementById("disasterMsg").textContent = "Şehir jeneratörleri çöküyor, bu tur teklif süresi 6 saniyeye indi!";
+          if (plus1Btn) plus1Btn.textContent = "+1 ₺";
+          if (plus3Btn) plus3Btn.textContent = "+3 ₺";
+        } else {
+          disasterBanner.style.display = "none";
+          if (plus1Btn) plus1Btn.textContent = "+1 ₺";
+          if (plus3Btn) plus3Btn.textContent = "+3 ₺";
+        }
+      }
+
+      if (roomState.phase === "finished") {
+        spinBtn.style.display = "none";
+        liveBidBtns.style.display = "none";
+        if (dutchBidBtns) dutchBidBtns.style.display = "none";
+        if (sealedAlert) sealedAlert.style.display = "none";
+        if (sealedPanel) sealedPanel.style.display = "none";
+        if (lockedBanner) lockedBanner.style.display = "none";
+        if (metricsBox) metricsBox.style.display = "none";
+        if (timerWrap) timerWrap.style.display = "none";
+        lotThumb.style.display = "none";
+        if (finishedPanel) finishedPanel.style.display = "block";
+        lotTitle.textContent = "🏆 Müzayede Tamamlandı!";
+        lotSub.textContent = "Yapay Zeka jürisi kadroları inceledi ve sıralamayı belirledi.";
+      } else if (roomState.auctionState === "idle") {
+        if (finishedPanel) finishedPanel.style.display = "none";
+        if (sealedAlert) sealedAlert.style.display = "none";
+        if (sealedPanel) sealedPanel.style.display = "none";
         spinBtn.style.display = "inline-flex";
         spinBtn.disabled = !isMyTurn;
         spinBtn.textContent = isMyTurn ? "⟳ Şeridi Döndür" : `⏳ Sıra: ${turnName}`;
@@ -3119,11 +3442,42 @@
         const leaderLbl = document.querySelector(".bid-leader-lbl");
         const leaderNameEl = document.getElementById("bidLeaderName");
 
+        const isSealed = roomState.roundMode === "sealed";
+        if (finishedPanel) finishedPanel.style.display = "none";
+
         if (isRosterFull) {
           liveBidBtns.style.display = "none";
           if (dutchBidBtns) dutchBidBtns.style.display = "none";
+          if (sealedAlert) sealedAlert.style.display = "none";
+          if (sealedPanel) sealedPanel.style.display = "none";
           if (lockedBanner) lockedBanner.style.display = "block";
+        } else if (isSealed) {
+          liveBidBtns.style.display = "none";
+          if (dutchBidBtns) dutchBidBtns.style.display = "none";
+          if (lockedBanner) lockedBanner.style.display = "none";
+          if (sealedAlert) sealedAlert.style.display = "block";
+          if (sealedPanel) {
+            sealedPanel.style.display = "flex";
+            const hint = document.getElementById("sealedMaxBudgetHint");
+            if (hint && me) hint.textContent = `/ ${me.budget} ₺`;
+            const submitBtn = document.getElementById("btnSubmitSealedBid");
+            const btnText = document.getElementById("btnSubmitSealedText");
+            const btnSub = document.getElementById("btnSubmitSealedSub");
+            if (roomState.sealedSubmitted) {
+              btnText.textContent = `✓ TEKLİFİN KİLİTLENDİ: ${roomState.mySealedBid} ₺`;
+              submitBtn.style.background = "linear-gradient(180deg, #10B981 0%, #059669 100%)";
+              submitBtn.style.borderBottomColor = "#047857";
+              btnSub.textContent = `Teklifini değiştirebilirsin • Katılan: ${roomState.sealedCount || 0} Kişi`;
+            } else {
+              btnText.textContent = "🔒 GİZLİ TEKLİFİ KİLİTLE";
+              submitBtn.style.background = "linear-gradient(180deg, #A855F7 0%, #7E22CE 100%)";
+              submitBtn.style.borderBottomColor = "#581C87";
+              btnSub.textContent = `Süre bitince zarflar açılacak • Katılan: ${roomState.sealedCount || 0} Kişi`;
+            }
+          }
         } else if (isDutch) {
+          if (sealedAlert) sealedAlert.style.display = "none";
+          if (sealedPanel) sealedPanel.style.display = "none";
           liveBidBtns.style.display = "none";
           if (lockedBanner) lockedBanner.style.display = "none";
           if (dutchBidBtns) {
@@ -3137,6 +3491,8 @@
             }
           }
         } else {
+          if (sealedAlert) sealedAlert.style.display = "none";
+          if (sealedPanel) sealedPanel.style.display = "none";
           liveBidBtns.style.display = "grid";
           if (dutchBidBtns) dutchBidBtns.style.display = "none";
           if (lockedBanner) lockedBanner.style.display = "none";
@@ -3352,6 +3708,97 @@
       if (arrowEl) {
         arrowEl.textContent = container.classList.contains("open") ? "▼" : "▲";
       }
+    }
+
+    // =========================================================================
+    // GİZLİ TEKLİF & AFET VE JÜRİ KONTROLLERİ
+    // =========================================================================
+    function adjustSealedBid(delta) {
+      const inp = document.getElementById("sealedBidAmountInput");
+      if (!inp || !roomState?.me) return;
+      const maxBudget = roomState.me.budget || 1;
+      let val = parseInt(inp.value, 10) || 1;
+      val = Math.max(1, Math.min(maxBudget, val + delta));
+      inp.value = val;
+    }
+
+    function setSealedBid(amt) {
+      const inp = document.getElementById("sealedBidAmountInput");
+      if (!inp || !roomState?.me) return;
+      const maxBudget = roomState.me.budget || 1;
+      inp.value = Math.max(1, Math.min(maxBudget, amt));
+    }
+
+    function setSealedMax() {
+      const inp = document.getElementById("sealedBidAmountInput");
+      if (!inp || !roomState?.me) return;
+      inp.value = roomState.me.budget || 1;
+    }
+
+    function onSealedBidInput() {
+      const inp = document.getElementById("sealedBidAmountInput");
+      if (!inp || !roomState?.me) return;
+      const maxBudget = roomState.me.budget || 1;
+      let val = parseInt(inp.value, 10) || 1;
+      if (val > maxBudget) inp.value = maxBudget;
+      if (val < 1) inp.value = 1;
+    }
+
+    function submitSealedBid() {
+      const inp = document.getElementById("sealedBidAmountInput");
+      if (!inp || !roomState?.me) return;
+      const amt = parseInt(inp.value, 10) || 1;
+      ws?.send(JSON.stringify({ action: "submit_sealed_bid", amount: amt }));
+      showToast(`Gizli teklifin (${amt} ₺) sunucuya iletildi!`);
+    }
+
+    function showSealedRevealModal(msg) {
+      const modal = document.getElementById("sealedRevealModal");
+      const sub = document.getElementById("sealedRevealSubtitle");
+      const list = document.getElementById("sealedRevealList");
+      if (!modal || !list) return;
+
+      const entryName = msg.entry?.name || "Karakter";
+      const winnerName = msg.winnerName;
+      const price = msg.price;
+
+      if (winnerName) {
+        sub.innerHTML = `<strong style="color:#34D399">${escapeHtml(winnerName)}</strong>, ${price} ₺ teklifle <strong>${escapeHtml(entryName)}</strong> karakterini kaptı!`;
+      } else {
+        sub.innerHTML = `Kimse teklif vermedi, ${escapeHtml(entryName)} pas geçildi.`;
+      }
+
+      list.innerHTML = (msg.reveal || []).map((r, idx) => {
+        const isWin = r.playerId === msg.winnerId;
+        return `
+          <div class="sealed-reveal-item ${isWin ? 'winner' : ''}">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-weight:800;color:${isWin ? 'var(--gold)' : 'var(--text-muted)'}">#${idx + 1}</span>
+              <strong>${escapeHtml(r.playerName)} ${isWin ? '🏆' : ''}</strong>
+            </div>
+            <div class="sealed-reveal-amt" style="color:${isWin ? 'var(--gold)' : 'var(--text-main)'}">
+              ${r.amount} ₺
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      modal.classList.add("open");
+      setTimeout(() => {
+        closeSealedRevealModal();
+      }, 4000);
+    }
+
+    function closeSealedRevealModal() {
+      const modal = document.getElementById("sealedRevealModal");
+      if (modal) modal.classList.remove("open");
+    }
+
+    function sendFinishGame() {
+      if (!confirm("Müzayedeyi erken bitirip Yapay Zeka Jürisini çağırmak istediğinize emin misiniz?")) {
+        return;
+      }
+      ws?.send(JSON.stringify({ action: "finish_game" }));
     }
 
     // =========================================================================
